@@ -214,9 +214,9 @@ function computeScore(d){
 }
 
 function bestWin(hrs){
-  if(!hrs||!hrs.length)return null;var bs=6,bsc=-1;
-  for(var s=5;s<=14;s++){var ws=0;for(var h=s;h<Math.min(s+5,hrs.length);h++){var hr=hrs[h];if(!hr)continue;var sc=20;if(hr.pp>40)sc-=8;if(hr.ws>20)sc-=5;if(hr.t>=45&&hr.t<=72)sc+=5;if((hr.uv||0)<6)sc+=2;ws+=sc;}if(ws>bsc){bsc=ws;bs=s;}}
-  var end=Math.min(bs+5,20);function fmt(h){return(h%12||12)+":00 "+(h>=12?"PM":"AM");}return fmt(bs)+" – "+fmt(end);
+  if(!hrs||!hrs.length)return null;var bs=7,bsc=-1;
+  for(var s=6;s<=14;s++){var ws=0;for(var h=s;h<Math.min(s+5,hrs.length);h++){var hr=hrs[h];if(!hr)continue;var sc=20;if(hr.pp>40)sc-=8;if(hr.ws>20)sc-=5;if(hr.t>=45&&hr.t<=72)sc+=5;if((hr.uv||0)<6)sc+=2;ws+=sc;}if(ws>bsc){bsc=ws;bs=s;}}
+  bs=Math.max(6,bs);var end=Math.min(bs+5,20);function fmt(h){return(h%12||12)+":00 "+(h>=12?"PM":"AM");}return fmt(bs)+" – "+fmt(end);
 }
 
 function getTips(d){
@@ -270,7 +270,7 @@ function parseWx(data){
 // ═══════════════════════════════════════
 function callAI(day,locName){
   if(!apiKey)return Promise.resolve(null);
-  var prompt='You are an expert hiking advisor. A hiker is planning an intense day hike (high elevation gain, aggressive inclines, 4-8 hours) near '+locName+'.\n\nWeather for '+day.disp+':\n- High: '+day.tmax+'°F, Low: '+day.tmin+'°F, Feels like: '+day.atmax+'°F\n- Precipitation: '+day.pprob+'% chance, '+day.psum+'" expected\n- Wind: '+day.wmax+' mph, gusts '+day.gmax+' mph\n- UV: '+day.uvmax+', Weather: '+(WMO[day.wcode]||"Unknown")+'\n- Sunrise: '+day.sr+', Sunset: '+day.ss+'\n- Hiking score: '+day.hike.score+'/100 ('+day.hike.label+')\n- Best window: '+day.win+'\n\nProvide TWO sections:\n\nSECTION 1 - TACTICAL ASSESSMENT:\nA concise tactical assessment in short paragraphs (no bullet points, no headers). Cover conditions for intense high-elevation day hiking, gear beyond basics, optimal timing, and safety warnings. Be specific to '+locName+'\'s geography.\n\nSECTION 2 - TRAIL SUGGESTIONS:\nAfter your assessment, output a JSON block with 3-5 trail suggestions. Format it EXACTLY like this, wrapped in <trails> tags:\n\n<trails>\n[{"name":"Trail Name","distance":"X miles","elevation":"X ft gain","difficulty":"Strenuous","why":"Brief reason this trail suits today\'s conditions","alltrails":"search terms for alltrails","webUrl":"URL to a webpage about this trail if you know one, otherwise empty string"}]\n</trails>\n\nFor alltrails field, provide good search terms. For webUrl, include a real URL to a hiking site, blog post, or park service page about this specific trail if you know one — otherwise leave as empty string. Suggest trails appropriate for an experienced hiker who wants aggressive inclines and significant elevation gain.';
+  var prompt='You are an expert hiking advisor. A hiker is planning an intense day hike (high elevation gain, aggressive inclines, 4-8 hours) near '+locName+'.\n\nHIKER PROFILE:\n- Experienced hiker who wants aggressive inclines and significant elevation gain\n- Loves gorgeous views and scenic payoffs — this is a top priority in trail selection\n- Strongly prefers solitude and quiet trails with fewer crowds. If a trail is exceptional enough to justify crowds, mention that trade-off explicitly\n- Earliest realistic start time is 6:00 AM. Do NOT suggest starting before 6 AM unless conditions are dangerous otherwise. A 7-8 AM start is more typical\n- Based in NYC area, frequently hikes the Catskills. Also planning trips to areas like Sedona\n\nWeather for '+day.disp+':\n- High: '+day.tmax+'°F, Low: '+day.tmin+'°F, Feels like: '+day.atmax+'°F\n- Precipitation: '+day.pprob+'% chance, '+day.psum+'" expected\n- Wind: '+day.wmax+' mph, gusts '+day.gmax+' mph\n- UV: '+day.uvmax+', Weather: '+(WMO[day.wcode]||"Unknown")+'\n- Sunrise: '+day.sr+', Sunset: '+day.ss+'\n- Hiking score: '+day.hike.score+'/100 ('+day.hike.label+')\n- Best window: '+day.win+'\n\nProvide TWO sections:\n\nSECTION 1 - TACTICAL ASSESSMENT:\nA concise tactical assessment in short paragraphs (no bullet points, no headers). Cover conditions for intense high-elevation day hiking, gear beyond basics, optimal timing (remember: no starts before 6 AM), and safety warnings. Be specific to '+locName+'\'s geography. Mention which trails offer the best views for these conditions.\n\nSECTION 2 - TRAIL SUGGESTIONS:\nAfter your assessment, output a JSON block with 3-5 trail suggestions. Format it EXACTLY like this, wrapped in <trails> tags:\n\n<trails>\n[{"name":"Trail Name","distance":"X miles","elevation":"X ft gain","difficulty":"Strenuous","why":"Brief reason — mention views and crowd level","alltrails":"exact trail name '+locName+'","webUrl":"URL to a webpage about this trail if you know one, otherwise empty string","crowdLevel":"Low/Moderate/High"}]\n</trails>\n\nIMPORTANT for the alltrails field: always include the trail name AND the location (e.g. "Bear Mountain Trail Sedona" not just "Bear Mountain Trail"). For webUrl, include a real URL to a hiking site, NPS page, or blog post about this trail if you know one — otherwise use empty string. Prioritize trails with great views and lower crowd levels. If suggesting a popular/crowded trail, explain why it is worth it.';
 
   return fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
@@ -445,16 +445,24 @@ function formatAI(text){
 
 function renderTrails(trails){
   if(!trails||!trails.length)return"";
+  var loc=curLoc?curLoc.name:"";
   return'<div class="icd" style="margin-top:12px;margin-bottom:0;padding:16px"><h4>🥾 Suggested Trails</h4>'+
     trails.map(function(t){
       var stats=[];
       if(t.distance)stats.push(t.distance);
       if(t.elevation)stats.push(t.elevation);
       if(t.difficulty)stats.push(t.difficulty);
-      var links='<div class="trl-links"><a href="https://www.alltrails.com/search?q='+encodeURIComponent(t.alltrails||t.name)+'" target="_blank" rel="noopener">AllTrails ↗</a><a href="https://www.google.com/search?q='+encodeURIComponent(t.name+" hiking trail")+'" target="_blank" rel="noopener">Google ↗</a>';
+      var crowdBadge="";
+      if(t.crowdLevel){
+        var cc=t.crowdLevel.toLowerCase();
+        var crowdColor=cc==="low"?"#4a7c59":cc==="moderate"?"#b8860b":"#c45a3c";
+        crowdBadge=' <span style="font-size:10px;font-weight:600;color:'+crowdColor+';border:1px solid '+crowdColor+'30;border-radius:4px;padding:1px 6px;margin-left:6px">👥 '+esc(t.crowdLevel)+'</span>';
+      }
+      var searchName=t.alltrails||t.name+" "+loc;
+      var links='<div class="trl-links"><a href="https://www.google.com/search?q='+encodeURIComponent(searchName+" alltrails")+'" target="_blank" rel="noopener">AllTrails ↗</a><a href="https://www.google.com/search?q='+encodeURIComponent(t.name+" hiking trail "+loc)+'" target="_blank" rel="noopener">Google ↗</a>';
       if(t.webUrl)links+='<a href="'+esc(t.webUrl)+'" target="_blank" rel="noopener">Info ↗</a>';
       links+='</div>';
-      return'<div class="trl-item"><div class="trl-name">'+esc(t.name)+'</div>'+(stats.length?'<div class="trl-stats">'+esc(stats.join(" · "))+'</div>':'')+(t.why?'<div class="trl-why">'+esc(t.why)+'</div>':'')+links+'</div>';
+      return'<div class="trl-item"><div class="trl-name">'+esc(t.name)+crowdBadge+'</div>'+(stats.length?'<div class="trl-stats">'+esc(stats.join(" · "))+'</div>':'')+(t.why?'<div class="trl-why">'+esc(t.why)+'</div>':'')+links+'</div>';
     }).join("")+'</div>';
 }
 
