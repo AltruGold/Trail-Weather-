@@ -12,7 +12,7 @@
 :root{--bg:#f4f0e8;--bgs:#ebe5d9;--card:#fffdf8;--tx:#3b3226;--txm:#6b5e4f;--txmu:#9a8e7d;--txl:#c0b6a6;--ac:#5c7a5a;--ach:#4a6848;--bd:#ddd5c8;--bdl:#ece6db;--dng:#c45a3c;--sh:0 2px 10px rgba(59,50,38,.05);--shl:0 8px 32px rgba(59,50,38,.12);--sf:'Crimson Pro',Georgia,serif;--sn:'DM Sans','Segoe UI',sans-serif}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--sn);background:var(--bg);color:var(--tx);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;line-height:1.5}
-button{font-family:var(--sn);cursor:pointer;border:none;background:none}input,textarea{font-family:var(--sn)}
+button{font-family:var(--sn);cursor:pointer;border:none;background:none}input,textarea,select{font-family:var(--sn)}
 a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -85,15 +85,36 @@ a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
 .tp-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdl);font-size:13px}
 .tp-row:last-child{border:none}
 .tp-rank{font-weight:700;font-size:16px;width:28px;text-align:center;flex-shrink:0}
-.tp-info{flex:1}
-.tp-day{font-weight:600}.tp-rec{font-size:12px;color:var(--txm);margin-top:1px}
+.tp-info{flex:1}.tp-day{font-weight:600}.tp-rec{font-size:12px;color:var(--txm);margin-top:1px}
+.tp-form{margin-top:12px;padding-top:12px;border-top:1px solid var(--bdl)}
+.tp-form label{font-size:11px;font-weight:600;color:var(--txmu);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px;margin-top:10px}
+.tp-form label:first-child{margin-top:0}
+.tp-form input,.tp-form textarea,.tp-form select{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13.5px;color:var(--tx);background:var(--bg);outline:none}
+.tp-form input:focus,.tp-form textarea:focus,.tp-form select:focus{border-color:var(--ac)}
+.tp-form textarea{resize:vertical;min-height:60px}
+.tp-day-sel{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.tp-ds{padding:6px 10px;border-radius:8px;border:1.5px solid var(--bd);font-size:12px;cursor:pointer;transition:all .15s;background:var(--bg);text-align:center;min-width:70px}
+.tp-ds.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.tp-ds .ds-day{font-weight:600}.tp-ds .ds-date{font-size:10px;opacity:.7}
+.tp-energy-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px}
+.tp-energy-row .tp-ed{font-weight:600;min-width:80px}
+.tp-energy-row select{width:auto;padding:5px 8px;font-size:12px;flex:1;max-width:160px}
+.tp-go{margin-top:14px;font-size:13px;font-weight:600;background:var(--ac);color:#fff;border-radius:8px;padding:10px 20px;width:100%;transition:all .2s}
+.tp-go:hover{background:var(--ach)}.tp-go:disabled{background:var(--bgs);color:var(--txmu)}
+
+/* Trip Plan Output */
+.tp-out{margin-top:14px;animation:fadeIn .3s ease}
+.tp-day-card{background:var(--bg);border:1px solid var(--bdl);border-radius:10px;padding:14px;margin-bottom:10px}
+.tp-day-card h5{font-family:var(--sf);font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.tp-day-card .tp-wx{font-size:12px;color:var(--txmu);margin-bottom:6px}
+.tp-day-card .tp-advice{font-size:13px;line-height:1.6;margin-bottom:8px}
+.tp-day-card .tp-advice p{margin:0 0 6px}
 
 .aibtn{font-size:13px;font-weight:600;background:var(--ac);color:#fff;border-radius:8px;padding:8px 16px;transition:all .2s}
 .aibtn:hover{background:var(--ach)}.aibtn:disabled{background:var(--bgs);color:var(--txmu);cursor:wait}
 .aiout{font-size:13px;line-height:1.7;margin-top:12px}
 .aiout p{margin:0 0 10px}
 
-/* AI Chat */
 .chat-msgs{max-height:300px;overflow-y:auto;margin-top:12px;padding-top:8px;border-top:1px solid var(--bdl)}
 .chat-msg{margin-bottom:10px;font-size:13px;line-height:1.6}
 .chat-msg.user{color:var(--ac);font-weight:600}
@@ -103,8 +124,7 @@ a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
 .chat-input{flex:1;border:1.5px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:13.5px;color:var(--tx);background:var(--bg);outline:none;resize:none;min-height:40px;max-height:80px}
 .chat-input:focus{border-color:var(--ac)}
 .chat-send{background:var(--ac);color:#fff;border-radius:8px;padding:0 16px;font-size:13px;font-weight:600;transition:all .2s;flex-shrink:0}
-.chat-send:hover{background:var(--ach)}
-.chat-send:disabled{background:var(--bgs);color:var(--txmu)}
+.chat-send:hover{background:var(--ach)}.chat-send:disabled{background:var(--bgs);color:var(--txmu)}
 
 .trl-item{padding:10px 0;border-bottom:1px solid var(--bdl)}.trl-item:last-child{border:none}
 .trl-name{font-weight:600;font-size:14px}.trl-stats{font-size:12px;color:var(--txmu);margin:2px 0}
@@ -179,7 +199,7 @@ a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
       <div class="sbox" id="sbox"><span style="font-size:16px;opacity:.4">🔍</span><input type="text" id="sinput" placeholder="Search a location..." autocomplete="off"><span id="sbusy" style="font-size:12px;color:var(--txmu);display:none">searching...</span></div>
       <button class="gps-btn" id="gpsbtn" onclick="useGPS()" title="Use my location">📍</button>
     </div>
-    <div class="gwarn" id="gwarn">Live search unavailable — showing matching presets.</div>
+    <div class="gwarn" id="gwarn"></div>
     <div class="sdd" id="sdd"></div>
   </div>
   <div class="frow" id="frow"></div>
@@ -196,7 +216,7 @@ a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
 <footer class="footer">Weather data from Open-Meteo · AI via Claude API · Built for serious hikers</footer>
 
 <script>
-var favs=[],curLoc=null,wxDays=null,selIdx=0,aiCache={},chatHistory={},apiKey="";
+var favs=[],curLoc=null,wxDays=null,selIdx=0,aiCache={},chatHistory={},tripChat=[],tripPlan=null,apiKey="";
 
 var PRESETS=[
   {name:"Sedona",admin1:"Arizona",country:"US",latitude:34.8697,longitude:-111.7610,elevation:1320},
@@ -265,19 +285,27 @@ function calcTrend(hrs){
 
 function getTips(d){
   var t=[],sc=d.hike.score;
-  if(sc>=85)t.push("Outstanding conditions for an aggressive day hike. Push for summit goals.");
+  if(sc>=85)t.push("Outstanding conditions for an aggressive day hike.");
   else if(sc>=70)t.push("Solid hiking day. Good for challenging routes with preparation.");
   else if(sc>=50)t.push("Hikeable but plan carefully. Consider shorter or lower-elevation routes.");
   else t.push("Conditions are challenging. Choose sheltered, low-elevation trails.");
   if(d.wmax>25)t.push("Avoid exposed ridgelines and above-treeline sections.");
-  if(d.pprob>50)t.push("Waterproof layers essential. Watch for flash flood zones in canyons.");
+  if(d.pprob>50)t.push("Waterproof layers essential. Watch for flash flood zones.");
   if(d.tmax>85)t.push("Start early. Carry 3L+ water. Electrolytes for steep ascents.");
   if(d.tmin<32)t.push("Microspikes recommended. Watch for black ice on north-facing slopes.");
-  if(d.uvmax>7)t.push("High UV — seek shaded trails or limit ridge exposure to early morning.");
+  if(d.uvmax>7)t.push("High UV — seek shaded trails or limit ridge exposure.");
   if(d.win)t.push("Best hiking window: "+d.win);return t;
 }
 
 function scbHTML(h,lg){var c=lg?"scb lg":"scb";return'<div class="'+c+'" style="background:'+h.color+'15"><span class="sn2" style="color:'+h.color+'">'+h.score+'</span><span class="sl" style="color:'+h.color+'">'+h.label+'</span></div>';}
+
+function allWxSummary(){
+  if(!wxDays)return"";
+  return wxDays.map(function(d){
+    var dt=new Date(d.date+"T12:00:00");
+    return dt.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})+": "+Math.round(d.tmax)+"°/"+Math.round(d.tmin)+"°F, "+(WMO[d.wcode]||"")+", precip "+d.pprob+"%, wind "+Math.round(d.wmax)+" mph gusts "+Math.round(d.gmax)+", UV "+d.uvmax.toFixed(1)+", score "+d.hike.score+"/100 ("+d.hike.label+"), trend: "+d.trend+", best window: "+d.win;
+  }).join("\n");
+}
 
 // ═══════════════════════════════════════
 // APIs
@@ -288,30 +316,21 @@ function geocodeAPI(q){
     .then(function(d){return{ok:true,results:d.results||[]};})
     .catch(function(e){return{ok:false,error:e.message,results:[]};});
 }
-
 function reverseGeocode(lat,lon){
   return fetch("https://geocoding-api.open-meteo.com/v1/search?name="+lat.toFixed(2)+","+lon.toFixed(2)+"&count=1&language=en&format=json")
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.results&&d.results.length)return d.results[0];
-      return{name:"My Location ("+lat.toFixed(4)+", "+lon.toFixed(4)+")",latitude:lat,longitude:lon,admin1:"",country:""};
-    })
+    .then(function(r){return r.json();}).then(function(d){return d.results&&d.results.length?d.results[0]:{name:"My Location",latitude:lat,longitude:lon,admin1:"",country:""};})
     .catch(function(){return{name:"My Location",latitude:lat,longitude:lon,admin1:"",country:""};});
 }
-
 function weatherAPI(lat,lon){
   var hp=["temperature_2m","relative_humidity_2m","apparent_temperature","precipitation_probability","precipitation","weather_code","cloud_cover","visibility","wind_speed_10m","wind_gusts_10m","uv_index"].join(",");
   var dp=["temperature_2m_max","temperature_2m_min","apparent_temperature_max","apparent_temperature_min","precipitation_sum","precipitation_probability_max","wind_speed_10m_max","wind_gusts_10m_max","uv_index_max","weather_code","sunrise","sunset"].join(",");
   return fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&hourly="+hp+"&daily="+dp+"&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=7")
     .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
-    .then(function(d){return{ok:true,data:d};})
-    .catch(function(e){return{ok:false,error:e.message};});
+    .then(function(d){return{ok:true,data:d};}).catch(function(e){return{ok:false,error:e.message};});
 }
-
 function parseWx(data){
   return data.daily.time.map(function(date,i){
-    var hrs=[];
-    for(var h=0;h<24;h++){var idx=i*24+h;if(idx<(data.hourly&&data.hourly.time?data.hourly.time.length:0)){hrs.push({time:data.hourly.time[idx],t:data.hourly.temperature_2m[idx],at:data.hourly.apparent_temperature[idx],rh:data.hourly.relative_humidity_2m[idx],pp:data.hourly.precipitation_probability[idx],pr:data.hourly.precipitation[idx],wc:data.hourly.weather_code[idx],cc:data.hourly.cloud_cover[idx],vis:data.hourly.visibility[idx],ws:data.hourly.wind_speed_10m[idx],wg:data.hourly.wind_gusts_10m[idx],uv:data.hourly.uv_index[idx]});}}
+    var hrs=[];for(var h=0;h<24;h++){var idx=i*24+h;if(idx<(data.hourly&&data.hourly.time?data.hourly.time.length:0)){hrs.push({time:data.hourly.time[idx],t:data.hourly.temperature_2m[idx],at:data.hourly.apparent_temperature[idx],rh:data.hourly.relative_humidity_2m[idx],pp:data.hourly.precipitation_probability[idx],pr:data.hourly.precipitation[idx],wc:data.hourly.weather_code[idx],cc:data.hourly.cloud_cover[idx],vis:data.hourly.visibility[idx],ws:data.hourly.wind_speed_10m[idx],wg:data.hourly.wind_gusts_10m[idx],uv:data.hourly.uv_index[idx]});}}
     var sr=data.daily.sunrise[i]?new Date(data.daily.sunrise[i]).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}):"";
     var ss=data.daily.sunset[i]?new Date(data.daily.sunset[i]).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}):"";
     var d={date:date,hrs:hrs,disp:new Date(date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}),tmax:data.daily.temperature_2m_max[i],tmin:data.daily.temperature_2m_min[i],atmax:data.daily.apparent_temperature_max[i],psum:data.daily.precipitation_sum[i],pprob:data.daily.precipitation_probability_max[i],wmax:data.daily.wind_speed_10m_max[i],gmax:data.daily.wind_gusts_10m_max[i],uvmax:data.daily.uv_index_max[i],wcode:data.daily.weather_code[i],sr:sr,ss:ss};
@@ -319,87 +338,99 @@ function parseWx(data){
   });
 }
 
+function claudeAPI(system,messages,maxTok){
+  return fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:maxTok||1500,system:system,messages:messages})
+  }).then(function(r){
+    if(r.status===401)throw new Error("Invalid API key. Check Settings.");
+    if(!r.ok)throw new Error("API error: HTTP "+r.status);return r.json();
+  }).then(function(data){return(data.content||[]).map(function(b){return b.text||"";}).join("\n");});
+}
+
 // ═══════════════════════════════════════
-// AI Trail Advisor + Chat
+// Per-Day AI Advisor
 // ═══════════════════════════════════════
-function buildSystemPrompt(day,locName){
-  return'You are an expert hiking advisor. The hiker is experienced — wants aggressive inclines, significant elevation gain, 4-8 hour day hikes. They love gorgeous views (top priority), prefer solitude and quiet trails. If a trail is crowded but exceptional, mention the trade-off. Earliest start: 6 AM, typical: 7-8 AM. They are based in the NYC area and frequently hike the Catskills.\n\nCurrent location: '+locName+'\nWeather for '+day.disp+': High '+day.tmax+'°F, Low '+day.tmin+'°F, Feels like '+day.atmax+'°F. Precip: '+day.pprob+'% chance, '+day.psum+'". Wind: '+day.wmax+' mph, gusts '+day.gmax+'. UV: '+day.uvmax+'. '+( WMO[day.wcode]||"")+'. Sunrise '+day.sr+', Sunset '+day.ss+'. Hiking score: '+day.hike.score+'/100 ('+day.hike.label+'). Best window: '+day.win+'.';
+function buildDaySystem(day,locName){
+  return'You are an expert hiking advisor. The hiker is experienced — wants aggressive inclines, significant elevation gain, 4-8 hour day hikes. They love gorgeous views (top priority), prefer solitude and quiet trails. If a trail is crowded but exceptional, mention the trade-off. Earliest start: 6 AM, typical: 7-8 AM. Based in NYC area, frequently hikes the Catskills.\n\nCurrent location: '+locName+'\nWeather for '+day.disp+': High '+day.tmax+'°F, Low '+day.tmin+'°F, Feels like '+day.atmax+'°F. Precip: '+day.pprob+'% chance, '+day.psum+'". Wind: '+day.wmax+' mph, gusts '+day.gmax+'. UV: '+day.uvmax+'. '+(WMO[day.wcode]||"")+'. Sunrise '+day.sr+', Sunset '+day.ss+'. Score: '+day.hike.score+'/100 ('+day.hike.label+'). Best window: '+day.win+'.';
 }
 
 function callAI(day,locName){
   if(!apiKey)return Promise.resolve(null);
-  var sysPrompt=buildSystemPrompt(day,locName);
-  var userMsg='Provide a concise tactical assessment in short paragraphs (no bullet points, no headers). Cover conditions, gear beyond basics, optimal timing, safety. Be specific to '+locName+'\'s geography. Mention which trails offer the best views for these conditions.\n\nIMPORTANT — After your assessment, you MUST output 3-5 trail suggestions as a JSON array wrapped in <trails> tags. This is required. Format EXACTLY like this example:\n\n<trails>\n[{"name":"Trail Name Here","distance":"5.2 miles","elevation":"1800 ft gain","difficulty":"Strenuous","why":"Stunning panoramic views from the summit with very few other hikers","alltrails":"Trail Name Here '+locName+'","webUrl":"https://example.com/trail-info or empty string if unknown","crowdLevel":"Low"}]\n</trails>\n\nRules for the JSON:\n- 3 to 5 trails, each with ALL fields shown above\n- "alltrails" field MUST include both the trail name AND "'+locName+'" for accurate search results\n- "crowdLevel" must be exactly "Low", "Moderate", or "High"\n- Prioritize trails with great views and lower crowd levels\n- If suggesting a popular/crowded trail, explain why it is worth it in the "why" field\n\nDo NOT skip the <trails> section. It is required.';
-
+  var sys=buildDaySystem(day,locName);
+  var userMsg='Provide a concise tactical assessment in short paragraphs (no bullet points, no headers). Cover conditions, gear beyond basics, optimal timing, safety. Be specific to '+locName+'\'s geography. Mention which trails offer the best views.\n\nIMPORTANT — After your assessment, you MUST output 3-5 trail suggestions as a JSON array wrapped in <trails> tags:\n\n<trails>\n[{"name":"Trail Name Here","distance":"5.2 miles","elevation":"1800 ft gain","difficulty":"Strenuous","why":"Stunning views with very few hikers","alltrails":"Trail Name Here '+locName+'","webUrl":"https://example.com or empty string","crowdLevel":"Low"}]\n</trails>\n\nRules: alltrails field MUST include trail name AND "'+locName+'". crowdLevel must be "Low", "Moderate", or "High". Prioritize views and low crowds. Do NOT skip the <trails> section.';
   var msgs=[{role:"user",content:userMsg}];
-  return claudeAPI(sysPrompt,msgs).then(function(text){
-    var trails=[];
-    var tm=text.match(/<trails>([\s\S]*?)<\/trails>/);
+  return claudeAPI(sys,msgs).then(function(text){
+    var trails=[];var tm=text.match(/<trails>([\s\S]*?)<\/trails>/);
     if(tm){try{trails=JSON.parse(tm[1].trim());}catch(e){}}
     var assessment=text.replace(/<trails>[\s\S]*?<\/trails>/,"").trim();
-    // Initialize chat history for this day
     chatHistory[selIdx]=[{role:"user",content:userMsg},{role:"assistant",content:text}];
     return{assessment:assessment,trails:trails};
   });
 }
 
-function sendChat(msg){
+function sendDayChat(msg){
   if(!apiKey||!wxDays)return;
-  var day=wxDays[selIdx];
-  var sysPrompt=buildSystemPrompt(day,curLoc.name);
+  var day=wxDays[selIdx];var sys=buildDaySystem(day,curLoc.name);
   if(!chatHistory[selIdx])chatHistory[selIdx]=[];
   chatHistory[selIdx].push({role:"user",content:msg});
-  // Build messages array (keep last 10 messages to stay within limits)
-  var msgs=chatHistory[selIdx].slice(-10);
-  return claudeAPI(sysPrompt,msgs).then(function(text){
-    chatHistory[selIdx].push({role:"assistant",content:text});
-    return text;
-  });
-}
-
-function claudeAPI(system,messages){
-  return fetch("https://api.anthropic.com/v1/messages",{
-    method:"POST",
-    headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,system:system,messages:messages})
-  })
-  .then(function(r){
-    if(r.status===401)throw new Error("Invalid API key. Check Settings.");
-    if(!r.ok)throw new Error("API error: HTTP "+r.status);
-    return r.json();
-  })
-  .then(function(data){
-    return(data.content||[]).map(function(b){return b.text||"";}).join("\n");
+  return claudeAPI(sys,chatHistory[selIdx].slice(-10)).then(function(text){
+    chatHistory[selIdx].push({role:"assistant",content:text});return text;
   });
 }
 
 // ═══════════════════════════════════════
-// GPS Location
+// Trip Mode AI
+// ═══════════════════════════════════════
+function buildTripSystem(){
+  return'You are an expert hiking trip planner. The hiker is experienced — loves gorgeous views (top priority), prefers solitude, wants aggressive inclines on strenuous days. Earliest start: 6 AM, typical: 7-8 AM. Based in NYC, frequently hikes the Catskills.\n\nLocation: '+curLoc.name+' ('+curLoc.region+')\n\n7-DAY FORECAST:\n'+allWxSummary()+'\n\nWhen suggesting trails, consider drive time from the hiker\'s lodging location. Try to cluster nearby trails on the same day. Avoid suggesting trails on opposite ends of the region on consecutive days unless weather forces it.';
+}
+
+function callTripAI(selectedDays,energyMap,lodging,notes){
+  if(!apiKey)return Promise.resolve(null);
+  var sys=buildTripSystem();
+  var dayDescs=selectedDays.map(function(i){
+    var d=wxDays[i];var dt=new Date(d.date+"T12:00:00");
+    return dt.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})+" (score "+d.hike.score+"/100, "+d.hike.label+") — Energy: "+energyMap[i];
+  }).join("\n");
+  var userMsg='Plan my '+selectedDays.length+'-day hiking trip near '+curLoc.name+'.\n\nDAYS I\'M HIKING:\n'+dayDescs+'\n'+(lodging?'LODGING: I\'m staying near '+lodging+'. Factor in drive time to trailheads.\n':'')+(notes?'ADDITIONAL NOTES: '+notes+'\n':'')+'\nFor EACH day, provide:\n1. A paragraph of tactical advice specific to that day\'s weather and energy level\n2. 1-2 trail recommendations matched to that day\'s conditions and energy budget\n\nOutput the full plan as JSON wrapped in <tripplan> tags:\n\n<tripplan>\n[{"dayIndex":0,"dayLabel":"Monday, Feb 9","advice":"Tactical advice paragraph...","trails":[{"name":"Trail Name","distance":"5 miles","elevation":"1800 ft gain","difficulty":"Strenuous","why":"Why this trail on this day","alltrails":"Trail Name '+curLoc.name+'","webUrl":"","crowdLevel":"Low","driveTime":"20 min from Uptown Sedona"}]}]\n</tripplan>\n\nRules:\n- dayIndex must match the forecast day index (0-6)\n- alltrails field MUST include trail name AND "'+curLoc.name+'"  \n- crowdLevel: "Low", "Moderate", or "High"\n- Include driveTime from lodging if provided\n- Match trail difficulty to each day\'s energy level (Strenuous/Moderate/Easy)\n- Put the hardest hike on the best weather day\n- Prioritize views and solitude\n- Do NOT skip the <tripplan> section';
+  tripChat=[{role:"user",content:userMsg}];
+  return claudeAPI(sys,[{role:"user",content:userMsg}],2500).then(function(text){
+    tripChat.push({role:"assistant",content:text});
+    var plan=[];var tm=text.match(/<tripplan>([\s\S]*?)<\/tripplan>/);
+    if(tm){try{plan=JSON.parse(tm[1].trim());}catch(e){}}
+    var overview=text.replace(/<tripplan>[\s\S]*?<\/tripplan>/,"").trim();
+    return{overview:overview,days:plan};
+  });
+}
+
+function sendTripChat(msg){
+  if(!apiKey)return;var sys=buildTripSystem();
+  tripChat.push({role:"user",content:msg});
+  return claudeAPI(sys,tripChat.slice(-10),2000).then(function(text){
+    tripChat.push({role:"assistant",content:text});return text;
+  });
+}
+
+// ═══════════════════════════════════════
+// GPS
 // ═══════════════════════════════════════
 function useGPS(){
-  if(!navigator.geolocation){alert("Geolocation not available on this device.");return;}
-  var btn=document.getElementById("gpsbtn");
-  btn.classList.add("loading");btn.textContent="⏳";
-  navigator.geolocation.getCurrentPosition(
-    function(pos){
-      btn.classList.remove("loading");btn.textContent="📍";
-      var lat=pos.coords.latitude,lon=pos.coords.longitude;
-      // Try to get a name for this location
-      reverseGeocode(lat,lon).then(function(geo){
-        selectLoc({name:geo.name||"My Location",latitude:lat,longitude:lon,admin1:geo.admin1||"",country:geo.country||""});
-      });
-    },
-    function(err){
-      btn.classList.remove("loading");btn.textContent="📍";
-      if(err.code===1)alert("Location access denied. Enable it in your browser settings.");
-      else alert("Could not get location: "+err.message);
-    },
-    {enableHighAccuracy:true,timeout:10000}
-  );
+  if(!navigator.geolocation){alert("Geolocation not available.");return;}
+  var btn=document.getElementById("gpsbtn");btn.classList.add("loading");btn.textContent="⏳";
+  navigator.geolocation.getCurrentPosition(function(pos){
+    btn.classList.remove("loading");btn.textContent="📍";
+    reverseGeocode(pos.coords.latitude,pos.coords.longitude).then(function(geo){
+      selectLoc({name:geo.name||"My Location",latitude:pos.coords.latitude,longitude:pos.coords.longitude,admin1:geo.admin1||"",country:geo.country||""});
+    });
+  },function(err){
+    btn.classList.remove("loading");btn.textContent="📍";
+    alert(err.code===1?"Location access denied.":"Could not get location: "+err.message);
+  },{enableHighAccuracy:true,timeout:10000});
 }
 
 // ═══════════════════════════════════════
-// Settings
+// Settings / Favorites / Search
 // ═══════════════════════════════════════
 function openModal(){document.getElementById("modal").classList.add("open");document.getElementById("keyIn").value=apiKey;document.getElementById("kst").textContent="";document.getElementById("keyIn").focus();}
 function closeModal(){document.getElementById("modal").classList.remove("open");}
@@ -407,18 +438,14 @@ function saveKey(){
   var k=document.getElementById("keyIn").value.trim();
   if(k&&!k.startsWith("sk-ant")){document.getElementById("kst").innerHTML='<span style="color:var(--dng)">Key should start with sk-ant...</span>';return;}
   apiKey=k;try{localStorage.setItem("twx-key",k);}catch(e){}
-  document.getElementById("kst").innerHTML='<span style="color:var(--ac)">✓ Key saved</span>';
-  updateKeyBanner();setTimeout(closeModal,800);
+  document.getElementById("kst").innerHTML='<span style="color:var(--ac)">✓ Saved</span>';updateKeyBanner();setTimeout(closeModal,800);
 }
 function updateKeyBanner(){
   var el=document.getElementById("keyBnr");
-  if(!apiKey){el.innerHTML='<div style="display:inline-block;background:rgba(92,122,90,.06);border:1px solid rgba(92,122,90,.2);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--txm)">💡 Tap ⚙️ to add your <a href="https://console.anthropic.com/settings/keys" target="_blank">Anthropic API key</a> for AI trail recommendations</div>';}
-  else{el.innerHTML='<div style="display:inline-block;background:rgba(92,122,90,.06);border:1px solid rgba(92,122,90,.2);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--ac)">✓ AI Trail Advisor enabled</div>';}
+  if(!apiKey)el.innerHTML='<div style="display:inline-block;background:rgba(92,122,90,.06);border:1px solid rgba(92,122,90,.2);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--txm)">💡 Tap ⚙️ to add your <a href="https://console.anthropic.com/settings/keys" target="_blank">Anthropic API key</a> for AI features</div>';
+  else el.innerHTML='<div style="display:inline-block;background:rgba(92,122,90,.06);border:1px solid rgba(92,122,90,.2);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--ac)">✓ AI Trail Advisor enabled</div>';
 }
 
-// ═══════════════════════════════════════
-// Favorites
-// ═══════════════════════════════════════
 function loadFavs(){try{var s=localStorage.getItem("twx-favs");if(s)favs=JSON.parse(s);}catch(e){}drawFavs();}
 function saveFavs(){try{localStorage.setItem("twx-favs",JSON.stringify(favs));}catch(e){}drawFavs();}
 function drawFavs(){
@@ -430,25 +457,21 @@ function rmFav(i){favs.splice(i,1);saveFavs();}
 function pickFav(i){var f=favs[i];selectLoc({name:f.name,latitude:f.lat,longitude:f.lon,admin1:f.admin1||"",country:f.country||""});}
 function updSvb(){var b=document.getElementById("svb");if(!curLoc)return;var is=favs.some(function(f){return f.name===curLoc.name&&f.lat===curLoc.lat;});b.className=is?"svb on":"svb";b.textContent=is?"★ Saved":"☆ Save";}
 
-// ═══════════════════════════════════════
-// Search
-// ═══════════════════════════════════════
 var stimer=null,searchRes=[];
 var sinput=document.getElementById("sinput"),sdd=document.getElementById("sdd");
-
 sinput.addEventListener("input",function(){
   clearTimeout(stimer);var q=sinput.value.trim();
-  if(q.length<2){sdd.className="sdd";sdd.innerHTML="";document.getElementById("gwarn").style.display="none";return;}
+  if(q.length<2){sdd.className="sdd";sdd.innerHTML="";return;}
   document.getElementById("sbusy").style.display="inline";
   stimer=setTimeout(function(){
     geocodeAPI(q).then(function(geo){
-      if(geo.ok&&geo.results.length>0){searchRes=geo.results.slice(0,6);document.getElementById("gwarn").style.display="none";}
-      else{var lw=q.toLowerCase();searchRes=PRESETS.filter(function(p){return p.name.toLowerCase().indexOf(lw)>=0||(p.admin1||"").toLowerCase().indexOf(lw)>=0;});document.getElementById("gwarn").style.display=geo.ok?"none":"block";}
+      if(geo.ok&&geo.results.length>0)searchRes=geo.results.slice(0,6);
+      else{var lw=q.toLowerCase();searchRes=PRESETS.filter(function(p){return p.name.toLowerCase().indexOf(lw)>=0||(p.admin1||"").toLowerCase().indexOf(lw)>=0;});}
       document.getElementById("sbusy").style.display="none";
       if(searchRes.length>0){
         sdd.innerHTML=searchRes.map(function(r,i){var rg=[r.admin1,r.country].filter(Boolean).join(", ");var el=r.elevation!=null?'<span class="el">'+Math.round(r.elevation*3.281).toLocaleString()+' ft</span>':"";return'<div class="si" data-i="'+i+'"><span class="nm">'+esc(r.name)+'</span><span class="rg">'+esc(rg)+'</span>'+el+'</div>';}).join("");
         sdd.className="sdd open";
-        sdd.querySelectorAll(".si").forEach(function(el){el.addEventListener("click",function(){var idx=parseInt(this.getAttribute("data-i"));selectLoc(searchRes[idx]);sinput.value="";sdd.className="sdd";});});
+        sdd.querySelectorAll(".si").forEach(function(el){el.addEventListener("click",function(){selectLoc(searchRes[parseInt(this.getAttribute("data-i"))]);sinput.value="";sdd.className="sdd";});});
       }else sdd.className="sdd";
     });
   },350);
@@ -457,11 +480,11 @@ sinput.addEventListener("focus",function(){document.getElementById("sbox").class
 document.addEventListener("click",function(e){if(!document.getElementById("swrap").contains(e.target)){sdd.className="sdd";document.getElementById("sbox").classList.remove("fo");}});
 
 // ═══════════════════════════════════════
-// Select Location & Fetch Weather
+// Location & Weather
 // ═══════════════════════════════════════
 function selectLoc(geo){
   curLoc={name:geo.name,lat:geo.latitude,lon:geo.longitude,region:[geo.admin1,geo.country].filter(Boolean).join(", "),admin1:geo.admin1||"",country:geo.country||""};
-  selIdx=0;aiCache={};chatHistory={};
+  selIdx=0;aiCache={};chatHistory={};tripChat=[];tripPlan=null;
   document.getElementById("empty").style.display="none";
   document.getElementById("wxc").style.display="none";
   document.getElementById("erb").style.display="none";
@@ -471,17 +494,15 @@ function selectLoc(geo){
   drawFavs();
   weatherAPI(curLoc.lat,curLoc.lon).then(function(res){
     document.getElementById("ldg").style.display="none";
-    if(res.ok&&res.data&&res.data.daily){
-      try{wxDays=parseWx(res.data);renderWx();}
-      catch(e){showErr("Parse error: "+e.message);}
-    }else showErr("Failed to fetch weather"+(res.error?": "+res.error:""));
+    if(res.ok&&res.data&&res.data.daily){try{wxDays=parseWx(res.data);renderWx();}catch(e){showErr("Parse error: "+e.message);}}
+    else showErr("Failed to fetch weather"+(res.error?": "+res.error:""));
   });
 }
 function doRetry(){if(curLoc)selectLoc({name:curLoc.name,latitude:curLoc.lat,longitude:curLoc.lon,admin1:curLoc.admin1,country:curLoc.country});}
 function showErr(m){document.getElementById("erb").style.display="block";document.getElementById("erm").textContent=m;}
 
 // ═══════════════════════════════════════
-// Render
+// Render Weather
 // ═══════════════════════════════════════
 function renderWx(){
   if(!wxDays)return;
@@ -489,42 +510,154 @@ function renderWx(){
   document.getElementById("locr").textContent=curLoc.region||"";
   document.getElementById("lh").className="lh show";updSvb();
   var bestI=0;wxDays.forEach(function(d,i){if(d.hike.score>wxDays[bestI].hike.score)bestI=i;});
-  var row=document.getElementById("drow");
-  row.innerHTML=wxDays.map(function(day,i){
+  document.getElementById("drow").innerHTML=wxDays.map(function(day,i){
     var dt=new Date(day.date+"T12:00:00");var dn=dt.toLocaleDateString("en-US",{weekday:"short"});var md=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-    var trendH="";
-    if(day.trend==="improving")trendH='<div class="tr" style="color:#4a7c59">↗ Improving</div>';
-    else if(day.trend==="worsening")trendH='<div class="tr" style="color:#c45a3c">↘ Worsening</div>';
-    return'<div class="dc'+(i===selIdx?" sel":"")+'" onclick="pickDay('+i+')" id="dc'+i+'">'+(i===bestI?'<div class="bb">Best Day</div>':'')+'<div class="dn">'+dn+'</div><div class="dd">'+md+'</div><div class="wi">'+wI(day.wcode)+'</div><div class="tm">'+Math.round(day.tmax)+'° / '+Math.round(day.tmin)+'°</div><div style="margin-top:5px">'+scbHTML(day.hike,false)+'</div>'+trendH+(day.pprob>20?'<div class="pp">💧 '+day.pprob+'%</div>':'')+'</div>';
+    var tH="";if(day.trend==="improving")tH='<div class="tr" style="color:#4a7c59">↗ Improving</div>';else if(day.trend==="worsening")tH='<div class="tr" style="color:#c45a3c">↘ Worsening</div>';
+    return'<div class="dc'+(i===selIdx?" sel":"")+'" onclick="pickDay('+i+')" id="dc'+i+'">'+(i===bestI?'<div class="bb">Best Day</div>':'')+'<div class="dn">'+dn+'</div><div class="dd">'+md+'</div><div class="wi">'+wI(day.wcode)+'</div><div class="tm">'+Math.round(day.tmax)+'° / '+Math.round(day.tmin)+'°</div><div style="margin-top:5px">'+scbHTML(day.hike,false)+'</div>'+tH+(day.pprob>20?'<div class="pp">💧 '+day.pprob+'%</div>':'')+'</div>';
   }).join("");
   document.getElementById("wxc").style.display="block";
   document.getElementById("empty").style.display="none";
   document.getElementById("erb").style.display="none";
-  renderTripPlanner();
-  renderDetail();
+  renderTripPlanner();renderDetail();
 }
 
 // ═══════════════════════════════════════
 // Trip Planner
 // ═══════════════════════════════════════
+var tpSelDays={};
 function renderTripPlanner(){
-  if(!wxDays||wxDays.length<2)return;
-  var ranked=wxDays.map(function(d,i){return{idx:i,score:d.hike.score,label:d.hike.label,color:d.hike.color,disp:d.disp,date:d.date};}).sort(function(a,b){return b.score-a.score;});
-  var recs=["Best for your hardest hike — push for summit goals","Second-best day — strong option for a challenging route","Good backup day for a moderate-to-strenuous hike"];
-  var html='<div class="tpln"><h4>📋 Trip Planner — Best Days Ranked</h4>';
+  if(!wxDays||wxDays.length<2){document.getElementById("tpln").innerHTML="";return;}
+  // Rankings
+  var ranked=wxDays.map(function(d,i){return{idx:i,score:d.hike.score,label:d.hike.label,color:d.hike.color,date:d.date};}).sort(function(a,b){return b.score-a.score;});
+  var recs=["Best for your hardest hike","Second-best for a challenging route","Good backup for moderate effort"];
+  var html='<div class="tpln"><h4>📋 Trip Planner</h4>';
+  // Quick rankings
+  html+='<div style="margin-bottom:14px">';
   ranked.forEach(function(r,i){
-    if(i>=3)return;
-    var dt=new Date(r.date+"T12:00:00");
-    var dayName=dt.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"});
+    if(i>=3)return;var dt=new Date(r.date+"T12:00:00");var dayN=dt.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"});
     var medal=i===0?"🥇":i===1?"🥈":"🥉";
-    html+='<div class="tp-row" style="cursor:pointer" onclick="pickDay('+r.idx+')"><div class="tp-rank">'+medal+'</div><div class="tp-info"><div class="tp-day">'+dayName+' <span style="font-weight:400;color:var(--txmu)">— '+r.score+'/100</span></div><div class="tp-rec">'+(recs[i]||"")+'</div></div>'+scbHTML({score:r.score,color:r.color,label:r.label},false)+'</div>';
+    html+='<div class="tp-row" style="cursor:pointer" onclick="pickDay('+r.idx+')"><div class="tp-rank">'+medal+'</div><div class="tp-info"><div class="tp-day">'+dayN+' <span style="font-weight:400;color:var(--txmu)">— '+r.score+'/100</span></div><div class="tp-rec">'+(recs[i]||"")+'</div></div>'+scbHTML({score:r.score,color:r.color,label:r.label},false)+'</div>';
   });
   html+='</div>';
+
+  // Trip Mode form
+  if(apiKey){
+    html+='<div class="tp-form" id="tpform"><div style="font-size:14px;font-weight:600;margin-bottom:8px">🗺️ Plan My Trip</div><div style="font-size:12px;color:var(--txmu);margin-bottom:10px">Select which days you\'re hiking and set your energy level for each. The AI will build an optimized itinerary with trail assignments and drive logistics.</div>';
+    html+='<label>Which days are you hiking? (tap to select)</label><div class="tp-day-sel" id="tpdays">';
+    wxDays.forEach(function(d,i){
+      var dt=new Date(d.date+"T12:00:00");var dn=dt.toLocaleDateString("en-US",{weekday:"short"});var md=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      var on=tpSelDays[i]?" on":"";
+      html+='<div class="tp-ds'+on+'" onclick="toggleTpDay('+i+')" id="tpd'+i+'"><div class="ds-day">'+dn+'</div><div class="ds-date">'+md+'</div></div>';
+    });
+    html+='</div>';
+    html+='<div id="tpEnergy" style="margin-top:10px"></div>';
+    html+='<label>Where are you staying?</label><input type="text" id="tpLodge" placeholder="e.g. Uptown Sedona, near Village of Oak Creek...">';
+    html+='<label>Anything else? (optional)</label><textarea id="tpNotes" placeholder="e.g. Want one sunset hike, prefer scrambles, need a rest day..."></textarea>';
+    html+='<button class="tp-go" id="tpgo" onclick="runTripAI()">Build My Trip Plan</button>';
+    html+='</div>';
+  }else{
+    html+='<div style="font-size:12px;color:var(--txmu);margin-top:6px;padding-top:10px;border-top:1px solid var(--bdl)">Add your API key in ⚙️ Settings to enable AI trip planning.</div>';
+  }
+
+  // Trip plan output
+  if(tripPlan){
+    html+=renderTripPlan();
+  }
+  html+='</div>';
   document.getElementById("tpln").innerHTML=html;
+  renderEnergySelectors();
+}
+
+function toggleTpDay(i){
+  tpSelDays[i]=!tpSelDays[i];
+  var el=document.getElementById("tpd"+i);
+  if(el)el.classList.toggle("on",!!tpSelDays[i]);
+  renderEnergySelectors();
+}
+
+function renderEnergySelectors(){
+  var el=document.getElementById("tpEnergy");if(!el)return;
+  var days=Object.keys(tpSelDays).filter(function(k){return tpSelDays[k];}).map(Number).sort();
+  if(!days.length){el.innerHTML="";return;}
+  el.innerHTML='<label>Energy level per day</label>'+days.map(function(i){
+    var d=wxDays[i];var dt=new Date(d.date+"T12:00:00");var dn=dt.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+    var val=document.querySelector("#tpe"+i)?document.querySelector("#tpe"+i).value:"strenuous";
+    return'<div class="tp-energy-row"><span class="tp-ed">'+dn+'</span><select id="tpe'+i+'"><option value="strenuous"'+(val==="strenuous"?" selected":"")+'>Strenuous</option><option value="moderate"'+(val==="moderate"?" selected":"")+'>Moderate</option><option value="easy"'+(val==="easy"?" selected":"")+'>Easy / Recovery</option><option value="rest"'+(val==="rest"?" selected":"")+'>Rest (no hike)</option></select></div>';
+  }).join("");
+}
+
+function runTripAI(){
+  var days=Object.keys(tpSelDays).filter(function(k){return tpSelDays[k];}).map(Number).sort();
+  if(days.length<1){alert("Select at least one day.");return;}
+  var energyMap={};days.forEach(function(i){var sel=document.getElementById("tpe"+i);energyMap[i]=sel?sel.value:"strenuous";});
+  var lodging=(document.getElementById("tpLodge")||{}).value||"";
+  var notes=(document.getElementById("tpNotes")||{}).value||"";
+  var btn=document.getElementById("tpgo");
+  btn.disabled=true;btn.textContent="Building your trip plan...";
+  callTripAI(days,energyMap,lodging,notes).then(function(result){
+    btn.disabled=false;btn.textContent="Rebuild Trip Plan";
+    if(result){tripPlan=result;renderTripPlanner();}
+  }).catch(function(e){
+    btn.disabled=false;btn.textContent="Retry Trip Plan";
+    alert("Error: "+e.message);
+  });
+}
+
+function renderTripPlan(){
+  if(!tripPlan)return"";
+  var html='<div class="tp-out">';
+  if(tripPlan.overview)html+='<div style="font-size:13px;line-height:1.6;margin-bottom:14px">'+formatAI(tripPlan.overview)+'</div>';
+  if(tripPlan.days&&tripPlan.days.length){
+    tripPlan.days.forEach(function(day){
+      var wxDay=wxDays[day.dayIndex];
+      html+='<div class="tp-day-card"><h5><span>'+wI(wxDay?wxDay.wcode:null)+'</span> '+esc(day.dayLabel)+'</h5>';
+      if(wxDay)html+='<div class="tp-wx">'+Math.round(wxDay.tmax)+'°/'+Math.round(wxDay.tmin)+'°F · '+(WMO[wxDay.wcode]||"")+" · Score: "+wxDay.hike.score+'/100 · '+wxDay.win+'</div>';
+      if(day.advice)html+='<div class="tp-advice">'+formatAI(day.advice)+'</div>';
+      if(day.trails&&day.trails.length)html+=renderTrailsInline(day.trails);
+      html+='</div>';
+    });
+  }
+  // Trip chat
+  var followUps=tripChat.slice(2);
+  if(followUps.length){
+    html+='<div class="chat-msgs" id="tripchatmsgs">';
+    followUps.forEach(function(m){
+      if(m.role==="user")html+='<div class="chat-msg user">'+esc(m.content)+'</div>';
+      else html+='<div class="chat-msg ai">'+formatAI(m.content)+'</div>';
+    });
+    html+='</div>';
+  }
+  html+='<div class="chat-input-row"><textarea class="chat-input" id="tripchatinput" placeholder="Adjust the plan... e.g. swap days, suggest something shorter, add a sunset hike..." rows="1" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();handleTripChat();}"></textarea><button class="chat-send" id="tripchatsend" onclick="handleTripChat()">Send</button></div>';
+  html+='</div>';
+  return html;
+}
+
+function handleTripChat(){
+  var input=document.getElementById("tripchatinput");
+  var btn=document.getElementById("tripchatsend");
+  var msg=input.value.trim();if(!msg||!apiKey)return;
+  input.value="";input.disabled=true;btn.disabled=true;btn.textContent="...";
+  var container=document.getElementById("tripchatmsgs");
+  if(!container){var inputRow=input.closest(".chat-input-row");container=document.createElement("div");container.className="chat-msgs";container.id="tripchatmsgs";inputRow.parentNode.insertBefore(container,inputRow);}
+  container.innerHTML+='<div class="chat-msg user">'+esc(msg)+'</div><div class="chat-msg ai" id="tripchatloading" style="color:var(--txmu)">Thinking...</div>';
+  container.scrollTop=container.scrollHeight;
+  sendTripChat(msg).then(function(text){
+    var ldg=document.getElementById("tripchatloading");
+    if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+formatAI(text)+'</div>';
+    input.disabled=false;btn.disabled=false;btn.textContent="Send";input.focus();
+    var c=document.getElementById("tripchatmsgs");if(c)c.scrollTop=c.scrollHeight;
+  }).catch(function(e){
+    var ldg=document.getElementById("tripchatloading");
+    if(ldg)ldg.outerHTML='<div class="chat-msg ai" style="color:var(--dng)">Error: '+esc(e.message)+'</div>';
+    input.disabled=false;btn.disabled=false;btn.textContent="Send";
+  });
 }
 
 function pickDay(i){selIdx=i;document.querySelectorAll(".dc").forEach(function(el,j){el.classList.toggle("sel",j===i);});renderDetail();}
 
+// ═══════════════════════════════════════
+// Render Day Detail
+// ═══════════════════════════════════════
 function renderDetail(){
   var day=wxDays[selIdx],tips=getTips(day),el=document.getElementById("ddet");
   var stats=[["High / Low",Math.round(day.tmax)+"° / "+Math.round(day.tmin)+"°F"],["Feels Like",Math.round(day.atmax)+"°F"],["Precipitation",day.pprob+"% · "+day.psum+'"'],["Wind",Math.round(day.wmax)+" mph, gusts "+Math.round(day.gmax)],["UV Index",(day.uvmax||0).toFixed(1)],["Sun",day.sr+" – "+day.ss]];
@@ -533,113 +666,81 @@ function renderDetail(){
   var issH=day.hike.issues.length?'<div style="margin-bottom:10px">'+day.hike.issues.map(function(s){return'<div class="iss">⚠ '+s+'</div>';}).join("")+'</div>':"";
   var tipH=tips.map(function(t){return'<p class="tip">'+t+'</p>';}).join("");
 
-  var cached=aiCache[selIdx];
-  var aiH;
+  var cached=aiCache[selIdx],aiH;
   if(cached){
     aiH='<div class="aiout">'+formatAI(cached.assessment)+'</div>';
-    if(cached.trails&&cached.trails.length)aiH+=renderTrails(cached.trails);
-    aiH+=renderChatUI();
+    if(cached.trails&&cached.trails.length)aiH+=renderTrailsInline(cached.trails);
+    aiH+=renderDayChatUI();
   }else if(!apiKey){
-    aiH='<p style="font-size:12px;color:var(--txmu);margin:6px 0 0">Add your Anthropic API key in ⚙️ Settings to enable AI trail recommendations.</p>';
+    aiH='<p style="font-size:12px;color:var(--txmu);margin:6px 0 0">Add your API key in ⚙️ Settings for AI recommendations.</p>';
   }else{
-    aiH='<button class="aibtn" id="aibtn" onclick="runAI()">Get AI Advice for '+esc(curLoc.name)+'</button><p style="font-size:11.5px;color:var(--txmu);margin-top:6px">Area-specific trail recommendations powered by Claude.</p>';
+    aiH='<button class="aibtn" id="aibtn" onclick="runAI()">Get AI Advice for '+esc(curLoc.name)+'</button><p style="font-size:11.5px;color:var(--txmu);margin-top:6px">Single-day trail recommendations. Use Trip Planner above for multi-day planning.</p>';
   }
 
   var hrows=day.hrs.map(function(hr){
-    var t=new Date(hr.time);var h=t.getHours();var lbl=h===0?"12 AM":h<12?h+" AM":h===12?"12 PM":(h-12)+" PM";
-    var ni=h<6||h>20?" ni":"";
+    var t=new Date(hr.time);var h=t.getHours();var lbl=h===0?"12 AM":h<12?h+" AM":h===12?"12 PM":(h-12)+" PM";var ni=h<6||h>20?" ni":"";
     return'<div class="hrow'+ni+'"><span class="ht2">'+lbl+'</span><span style="font-size:14px">'+wI(hr.wc)+'</span><span>'+Math.round(hr.t)+'°F</span><span style="color:'+(hr.pp>40?"var(--dng)":"var(--txmu)")+'">💧 '+hr.pp+'%</span><span style="color:'+(hr.ws>20?"var(--dng)":"var(--txmu)")+'">💨 '+Math.round(hr.ws)+'</span><span style="color:'+((hr.uv||0)>6?"var(--dng)":"var(--txmu)")+'">'+(hr.uv||0).toFixed(1)+'</span><span style="color:var(--txmu)">'+Math.round(hr.rh)+'%</span></div>';
   }).join("");
 
   el.innerHTML=
-    '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px"><div style="flex:1 1 260px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:40px">'+wI(day.wcode)+'</span><div><h3 style="font-family:var(--sf);font-size:22px;font-weight:700">'+day.disp+'</h3><div style="font-size:12.5px;color:var(--txmu)">'+(WMO[day.wcode]||"")+(day.trend&&day.trend!=="steady"?' · <span style="color:'+(day.trend==="improving"?"#4a7c59":"#c45a3c")+'">'+( day.trend==="improving"?"↗ Conditions improving through day":"↘ Conditions worsening through day")+'</span>':'')+'</div></div></div>'+scbHTML(day.hike,true)+'</div><div style="flex:1 1 220px;display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;font-size:13px">'+stats.map(function(s){return'<div><div class="stl" style="color:var(--txmu);font-size:10px;text-transform:uppercase;letter-spacing:.6px">'+s[0]+'</div><div style="color:var(--tx);font-weight:500;margin-top:1px">'+s[1]+'</div></div>';}).join("")+'</div></div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px"><div style="flex:1 1 260px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:40px">'+wI(day.wcode)+'</span><div><h3 style="font-family:var(--sf);font-size:22px;font-weight:700">'+day.disp+'</h3><div style="font-size:12.5px;color:var(--txmu)">'+(WMO[day.wcode]||"")+(day.trend!=="steady"?' · <span style="color:'+(day.trend==="improving"?"#4a7c59":"#c45a3c")+'">'+(day.trend==="improving"?"↗ Improving":"↘ Worsening")+'</span>':'')+'</div></div></div>'+scbHTML(day.hike,true)+'</div><div style="flex:1 1 220px;display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;font-size:13px">'+stats.map(function(s){return'<div><div style="color:var(--txmu);font-size:10px;text-transform:uppercase;letter-spacing:.6px">'+s[0]+'</div><div style="color:var(--tx);font-weight:500;margin-top:1px">'+s[1]+'</div></div>';}).join("")+'</div></div>'+
     winH+
     '<div class="icd"><h4>Trail Conditions Assessment</h4>'+posH+issH+'<div class="divr">'+tipH+'</div></div>'+
-    '<div class="icd"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:'+(cached?'12':'0')+'px"><h4 style="margin:0">🤖 AI Trail Advisor</h4></div>'+aiH+'</div>'+
+    '<div class="icd"><h4 style="margin-bottom:'+(cached?'12':'10')+'px">🤖 AI Trail Advisor</h4>'+aiH+'</div>'+
     '<div class="hw"><h4>Hourly Breakdown</h4><div class="hs"><div class="htbl"><div class="hh"><span>Time</span><span></span><span>Temp</span><span>Precip</span><span>Wind</span><span>UV</span><span>Humid</span></div><div class="hbd">'+hrows+'</div></div></div></div>';
 }
 
-function formatAI(text){
-  return text.split("\n\n").map(function(p){p=p.trim();if(!p)return"";return"<p>"+esc(p).replace(/\n/g,"<br>")+"</p>";}).join("");
-}
+function formatAI(text){return text.split("\n\n").map(function(p){p=p.trim();if(!p)return"";return"<p>"+esc(p).replace(/\n/g,"<br>")+"</p>";}).join("");}
 
-function renderTrails(trails){
+function renderTrailsInline(trails){
   if(!trails||!trails.length)return"";
   var loc=curLoc?curLoc.name:"";
-  return'<div class="icd" style="margin-top:12px;margin-bottom:0;padding:16px"><h4>🥾 Suggested Trails</h4>'+
+  return'<div style="margin-top:10px"><div style="font-weight:700;font-size:13px;margin-bottom:6px">🥾 Suggested Trails</div>'+
     trails.map(function(t){
       var stats=[];if(t.distance)stats.push(t.distance);if(t.elevation)stats.push(t.elevation);if(t.difficulty)stats.push(t.difficulty);
+      if(t.driveTime)stats.push("🚗 "+t.driveTime);
       var crowdBadge="";
-      if(t.crowdLevel){var cc=t.crowdLevel.toLowerCase();var crowdColor=cc==="low"?"#4a7c59":cc==="moderate"?"#b8860b":"#c45a3c";crowdBadge=' <span style="font-size:10px;font-weight:600;color:'+crowdColor+';border:1px solid '+crowdColor+'30;border-radius:4px;padding:1px 6px;margin-left:6px">👥 '+esc(t.crowdLevel)+'</span>';}
-      var searchName=t.alltrails||t.name+" "+loc;
-      var links='<div class="trl-links"><a href="https://www.google.com/search?q='+encodeURIComponent(searchName+" alltrails")+'" target="_blank" rel="noopener">AllTrails ↗</a><a href="https://www.google.com/search?q='+encodeURIComponent(t.name+" hiking trail "+loc)+'" target="_blank" rel="noopener">Google ↗</a>';
-      if(t.webUrl)links+='<a href="'+esc(t.webUrl)+'" target="_blank" rel="noopener">Info ↗</a>';
-      links+='</div>';
+      if(t.crowdLevel){var cc=t.crowdLevel.toLowerCase();var col=cc==="low"?"#4a7c59":cc==="moderate"?"#b8860b":"#c45a3c";crowdBadge=' <span style="font-size:10px;font-weight:600;color:'+col+';border:1px solid '+col+'30;border-radius:4px;padding:1px 6px;margin-left:6px">👥 '+esc(t.crowdLevel)+'</span>';}
+      var sn=t.alltrails||t.name+" "+loc;
+      var links='<div class="trl-links"><a href="https://www.google.com/search?q='+encodeURIComponent(sn+" alltrails")+'" target="_blank" rel="noopener">AllTrails ↗</a><a href="https://www.google.com/search?q='+encodeURIComponent(t.name+" hiking trail "+loc)+'" target="_blank" rel="noopener">Google ↗</a>';
+      if(t.webUrl)links+='<a href="'+esc(t.webUrl)+'" target="_blank" rel="noopener">Info ↗</a>';links+='</div>';
       return'<div class="trl-item"><div class="trl-name">'+esc(t.name)+crowdBadge+'</div>'+(stats.length?'<div class="trl-stats">'+esc(stats.join(" · "))+'</div>':'')+(t.why?'<div class="trl-why">'+esc(t.why)+'</div>':'')+links+'</div>';
     }).join("")+'</div>';
 }
 
-function renderChatUI(){
-  var msgs=chatHistory[selIdx]||[];
-  // Only show user follow-up messages (skip the initial system exchange)
-  var followUps=msgs.slice(2);
-  var chatMsgsH="";
+function renderDayChatUI(){
+  var msgs=chatHistory[selIdx]||[];var followUps=msgs.slice(2);var h="";
   if(followUps.length){
-    chatMsgsH='<div class="chat-msgs" id="chatmsgs">';
-    followUps.forEach(function(m){
-      if(m.role==="user")chatMsgsH+='<div class="chat-msg user">'+esc(m.content)+'</div>';
-      else chatMsgsH+='<div class="chat-msg ai">'+formatAI(m.content)+'</div>';
-    });
-    chatMsgsH+='</div>';
+    h='<div class="chat-msgs" id="chatmsgs">';
+    followUps.forEach(function(m){h+=m.role==="user"?'<div class="chat-msg user">'+esc(m.content)+'</div>':'<div class="chat-msg ai">'+formatAI(m.content)+'</div>';});
+    h+='</div>';
   }
-  return chatMsgsH+'<div class="chat-input-row"><textarea class="chat-input" id="chatinput" placeholder="Ask about these trails, request different options..." rows="1" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();handleChat();}"></textarea><button class="chat-send" id="chatsend" onclick="handleChat()">Send</button></div>';
+  return h+'<div class="chat-input-row"><textarea class="chat-input" id="chatinput" placeholder="Ask about these trails, request different options..." rows="1" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();handleDayChat();}"></textarea><button class="chat-send" id="chatsend" onclick="handleDayChat()">Send</button></div>';
 }
 
-function handleChat(){
-  var input=document.getElementById("chatinput");
-  var btn=document.getElementById("chatsend");
-  var msg=input.value.trim();
-  if(!msg||!apiKey)return;
+function handleDayChat(){
+  var input=document.getElementById("chatinput"),btn=document.getElementById("chatsend");
+  var msg=input.value.trim();if(!msg||!apiKey)return;
   input.value="";input.disabled=true;btn.disabled=true;btn.textContent="...";
-
-  // Add user message to UI immediately
   var container=document.getElementById("chatmsgs");
-  if(!container){
-    // Create container before input row
-    var inputRow=input.closest(".chat-input-row");
-    container=document.createElement("div");
-    container.className="chat-msgs";container.id="chatmsgs";
-    inputRow.parentNode.insertBefore(container,inputRow);
-  }
-  container.innerHTML+='<div class="chat-msg user">'+esc(msg)+'</div>';
-  container.innerHTML+='<div class="chat-msg ai" id="chatloading" style="color:var(--txmu)">Thinking...</div>';
+  if(!container){var row=input.closest(".chat-input-row");container=document.createElement("div");container.className="chat-msgs";container.id="chatmsgs";row.parentNode.insertBefore(container,row);}
+  container.innerHTML+='<div class="chat-msg user">'+esc(msg)+'</div><div class="chat-msg ai" id="chatloading" style="color:var(--txmu)">Thinking...</div>';
   container.scrollTop=container.scrollHeight;
-
-  sendChat(msg).then(function(text){
-    var ldg=document.getElementById("chatloading");
-    if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+formatAI(text)+'</div>';
-    input.disabled=false;btn.disabled=false;btn.textContent="Send";
-    input.focus();
+  sendDayChat(msg).then(function(text){
+    var l=document.getElementById("chatloading");if(l)l.outerHTML='<div class="chat-msg ai">'+formatAI(text)+'</div>';
+    input.disabled=false;btn.disabled=false;btn.textContent="Send";input.focus();
     var c=document.getElementById("chatmsgs");if(c)c.scrollTop=c.scrollHeight;
   }).catch(function(e){
-    var ldg=document.getElementById("chatloading");
-    if(ldg)ldg.outerHTML='<div class="chat-msg ai" style="color:var(--dng)">Error: '+esc(e.message)+'</div>';
+    var l=document.getElementById("chatloading");if(l)l.outerHTML='<div class="chat-msg ai" style="color:var(--dng)">Error: '+esc(e.message)+'</div>';
     input.disabled=false;btn.disabled=false;btn.textContent="Send";
   });
 }
 
 function runAI(){
-  var btn=document.getElementById("aibtn");
-  if(btn){btn.disabled=true;btn.textContent="Analyzing conditions...";}
-  var day=wxDays[selIdx];
-  callAI(day,curLoc.name).then(function(result){
-    if(result){aiCache[selIdx]=result;renderDetail();}
-    else{renderDetail();}
-  }).catch(function(e){
-    var el=document.getElementById("aibtn");
-    if(el){el.disabled=false;el.textContent="Retry AI Advice";}
-    var par=el?el.parentElement:null;
-    if(par){var err=document.createElement("div");err.style.cssText="font-size:12.5px;color:var(--dng);margin-top:8px";err.textContent=e.message;par.appendChild(err);}
+  var btn=document.getElementById("aibtn");if(btn){btn.disabled=true;btn.textContent="Analyzing conditions...";}
+  callAI(wxDays[selIdx],curLoc.name).then(function(r){if(r){aiCache[selIdx]=r;}renderDetail();}).catch(function(e){
+    var b=document.getElementById("aibtn");if(b){b.disabled=false;b.textContent="Retry";}
+    var p=b?b.parentElement:null;if(p){var err=document.createElement("div");err.style.cssText="font-size:12.5px;color:var(--dng);margin-top:8px";err.textContent=e.message;p.appendChild(err);}
   });
 }
 
