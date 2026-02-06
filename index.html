@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Trail Weather">
+<title>Trail Weather Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f0e8;--bgs:#ebe5d9;--card:#fffdf8;--tx:#3b3226;--txm:#6b5e4f;--txmu:#9a8e7d;--txl:#c0b6a6;--ac:#5c7a5a;--ach:#4a6848;--bd:#ddd5c8;--bdl:#ece6db;--dng:#c45a3c;--sh:0 2px 10px rgba(59,50,38,.05);--shl:0 8px 32px rgba(59,50,38,.12);--sf:'Crimson Pro',Georgia,serif;--sn:'DM Sans','Segoe UI',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sn);background:var(--bg);color:var(--tx);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;line-height:1.5}
+button{font-family:var(--sn);cursor:pointer;border:none;background:none}input{font-family:var(--sn)}
+a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.hdr{background:var(--card);border-bottom:1px solid var(--bd);padding:14px 20px;position:sticky;top:0;z-index:50}
+.hdr-in{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.hdr-left{display:flex;align-items:center;gap:9px}
+.hdr h1{font-family:var(--sf);font-size:22px;font-weight:700;letter-spacing:-.3px}
+.hdr .sub{font-size:12px;color:var(--txmu);margin:1px 0 0 33px}
+.gear{font-size:20px;padding:6px;border-radius:8px;opacity:.55;transition:all .15s}
+.gear:hover{background:var(--bgs);opacity:1}
+.mn{max-width:960px;margin:0 auto;padding:16px 16px 60px}
+
+/* Search */
+.swrap{position:relative;margin-bottom:12px}
+.sbox{display:flex;align-items:center;gap:9px;background:var(--card);border:1.5px solid var(--bd);border-radius:12px;padding:11px 14px;box-shadow:var(--sh);transition:all .2s}
+.sbox.fo{border-color:var(--ac);box-shadow:0 0 0 3px rgba(92,122,90,.07)}
+.sbox input{flex:1;border:none;outline:none;background:transparent;font-size:15px;color:var(--tx)}
+.sbox input::placeholder{color:var(--txl)}
+.sdd{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:var(--shl);z-index:90;max-height:320px;overflow-y:auto;display:none}
+.sdd.open{display:block}
+.si{padding:11px 14px;cursor:pointer;font-size:14px;border-bottom:1px solid var(--bdl);transition:background .12s}
+.si:last-child{border:none}.si:hover,.si:active{background:var(--bgs)}
+.si .nm{font-weight:600}.si .rg{color:var(--txmu);margin-left:6px}.si .el{color:var(--txl);margin-left:8px;font-size:12px}
+.gwarn{font-size:11px;color:var(--dng);padding:5px 14px 0;display:none}
+
+.frow{display:none;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center}.frow.show{display:flex}
+.flbl{font-size:11px;color:var(--txmu);margin-right:2px}
+.fc{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:18px;background:var(--card);color:var(--tx);border:1px solid var(--bd);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .2s}
+.fc.act{background:var(--ac);color:#fff;border-color:var(--ac)}.fc .rx{margin-left:2px;opacity:.5;font-size:9px}
+
+.lh{display:none;align-items:center;gap:10px;margin-bottom:14px;animation:fadeIn .3s ease}.lh.show{display:flex}
+.lh h2{font-family:var(--sf);font-size:20px;font-weight:700;flex:1;line-height:1.3}
+.lh .rg{font-size:12px;color:var(--txmu);display:block;font-weight:400}
+.svb{font-size:12px;font-weight:600;color:var(--txmu);border:1px solid var(--bd);border-radius:7px;padding:6px 12px;transition:all .2s;background:transparent}
+.svb.on{background:rgba(92,122,90,.08);color:var(--ac);border-color:rgba(92,122,90,.3)}
+
+.drow{display:flex;gap:7px;overflow-x:auto;padding:4px 0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.drow::-webkit-scrollbar{display:none}
+.dc{flex:0 0 auto;width:110px;background:var(--card);border:1.5px solid var(--bd);border-radius:13px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.dc:hover{border-color:rgba(92,122,90,.45)}
+.dc.sel{background:rgba(92,122,90,.04);border:2px solid var(--ac);box-shadow:0 3px 14px rgba(92,122,90,.12)}
+.dc .dn{font-weight:700;font-size:13px}.dc .dd{font-size:11px;color:var(--txmu);margin-bottom:4px}
+.dc .wi{font-size:26px;margin-bottom:3px}.dc .tm{font-family:var(--sf);font-size:14.5px;font-weight:600}
+.dc .pp{font-size:10px;color:var(--txmu);margin-top:2px}
+.bb{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--ac);color:#fff;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+
+.scb{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:4px 10px}
+.scb.lg{gap:10px;border-radius:12px;padding:7px 15px}
+.scb .sn2{font-weight:700;font-size:17px;line-height:1}.scb.lg .sn2{font-size:26px}
+.scb .sl{font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.9px}.scb.lg .sl{font-size:12px}
+
+.dt{margin-top:14px;animation:fadeIn .3s ease}
+.icd{background:var(--card);border:1px solid var(--bd);border-radius:11px;padding:18px;margin-bottom:12px}
+.icd h4{font-family:var(--sf);font-size:16px;font-weight:700;margin-bottom:10px}
+.pt{display:inline-block;background:rgba(74,124,89,.07);color:#4a7c59;font-size:11px;font-weight:600;border-radius:5px;padding:2px 9px;margin:0 4px 4px 0}
+.iss{font-size:12.5px;color:#8b4513;padding:2px 0;line-height:1.45}
+.tip{font-size:13px;line-height:1.6;margin:0 0 4px}
+.divr{border-top:1px solid var(--bdl);padding-top:10px;margin-top:8px}
+.wbn{background:rgba(92,122,90,.05);border:1px solid rgba(92,122,90,.17);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:13.5px}
+.wbn strong{font-weight:700;color:var(--ac)}
+
+.aibtn{font-size:13px;font-weight:600;background:var(--ac);color:#fff;border-radius:8px;padding:8px 16px;transition:all .2s}
+.aibtn:hover{background:var(--ach)}.aibtn:disabled{background:var(--bgs);color:var(--txmu);cursor:wait}
+.aiout{font-size:13px;line-height:1.7;margin-top:12px}
+.aiout p{margin:0 0 10px}
+.trl-item{padding:10px 0;border-bottom:1px solid var(--bdl)}.trl-item:last-child{border:none}
+.trl-name{font-weight:600;font-size:14px}.trl-stats{font-size:12px;color:var(--txmu);margin:2px 0}
+.trl-why{font-size:12.5px;color:var(--txm);line-height:1.5;margin:2px 0}
+.trl-links{display:flex;gap:7px;margin-top:5px;flex-wrap:wrap}
+.trl-links a{font-size:11px;font-weight:600;color:var(--ac);padding:3px 9px;border:1px solid rgba(92,122,90,.3);border-radius:6px;transition:all .15s}
+.trl-links a:hover{background:rgba(92,122,90,.08);text-decoration:none}
+
+.hw{background:var(--card);border:1px solid var(--bd);border-radius:11px;overflow:hidden;margin-bottom:14px}
+.hw h4{font-family:var(--sf);font-size:16px;font-weight:700;padding:12px 14px 8px}
+.hs{overflow-x:auto}.htbl{min-width:540px}
+.hh{display:grid;grid-template-columns:56px 30px 62px 70px 66px 56px 52px;gap:5px;padding:3px 10px 6px;font-size:9.5px;color:var(--txmu);text-transform:uppercase;letter-spacing:.6px;font-weight:600;border-bottom:1.5px solid var(--bd)}
+.hbd{max-height:400px;overflow-y:auto}
+.hrow{display:grid;grid-template-columns:56px 30px 62px 70px 66px 56px 52px;gap:5px;align-items:center;padding:6px 10px;font-size:12px;border-bottom:1px solid var(--bdl)}
+.hrow.ni{background:rgba(244,240,232,.5)}.hrow .ht2{font-weight:600}
+
+.pttl{font-size:12px;color:var(--txmu);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px}
+.pgr{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.pcd{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;transition:all .2s}
+.pcd:hover,.pcd:active{border-color:var(--ac);background:rgba(92,122,90,.03)}
+.pcd .pn{font-weight:600}.pcd .pr{font-size:11px;color:var(--txmu);margin-top:1px}
+
+.emp{text-align:center;padding:30px 20px 22px}
+.emp .big{font-size:46px;margin-bottom:10px;opacity:.5}
+.emp h2{font-family:var(--sf);font-size:22px;font-weight:600;margin-bottom:8px}
+.emp p{font-size:13.5px;max-width:440px;margin:0 auto 24px;line-height:1.6;color:var(--txm)}
+.ldg{text-align:center;padding:50px 20px;color:var(--txmu);display:none}
+.ldg .li{font-size:36px;margin-bottom:10px;animation:pulse 1.5s ease-in-out infinite}
+.erb{text-align:center;padding:24px 18px;margin-bottom:14px;background:rgba(196,90,60,.03);border:1px solid rgba(196,90,60,.15);border-radius:11px;display:none}
+.erb .em{color:var(--dng);font-size:13px;margin-bottom:8px;line-height:1.5}
+.erb button{font-size:13px;font-weight:600;background:var(--ac);color:#fff;border-radius:8px;padding:7px 14px}
+
+.mbg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(59,50,38,.4);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.mbg.open{display:flex}
+.mdl{background:var(--card);border-radius:16px;padding:26px 22px;max-width:420px;width:100%;box-shadow:var(--shl)}
+.mdl h3{font-family:var(--sf);font-size:19px;font-weight:700;margin-bottom:5px}
+.mdl p{font-size:12.5px;color:var(--txmu);line-height:1.5;margin-bottom:14px}
+.mdl label{font-size:11px;font-weight:600;color:var(--txmu);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+.mdl input{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:14px;color:var(--tx);background:var(--bg);outline:none}
+.mdl input:focus{border-color:var(--ac)}
+.mdl .brow{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+.mdl .bcn{font-size:13px;font-weight:600;color:var(--txmu);padding:8px 14px;border-radius:8px;border:1px solid var(--bd)}
+.mdl .bsv{font-size:13px;font-weight:600;background:var(--ac);color:#fff;padding:8px 18px;border-radius:8px}
+.mdl .bsv:hover{background:var(--ach)}
+.mdl .sts{font-size:11.5px;margin-top:6px}
+
+.footer{text-align:center;padding:18px;font-size:11px;color:var(--txl);border-top:1px solid var(--bdl)}
+@media(max-width:600px){.hdr h1{font-size:19px}.dc{width:102px}}
+</style>
+</head>
+<body>
+
+<div class="mbg" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="mdl">
+    <h3>⚙️ Settings</h3>
+    <p>Enter your Anthropic API key for AI Trail Advisor. Stored only in this browser. <a href="https://console.anthropic.com/settings/keys" target="_blank">Get a key →</a></p>
+    <label>API Key</label>
+    <input type="password" id="keyIn" placeholder="sk-ant-..." autocomplete="off">
+    <div id="kst" class="sts"></div>
+    <div class="brow">
+      <button class="bcn" onclick="closeModal()">Cancel</button>
+      <button class="bsv" onclick="saveKey()">Save</button>
+    </div>
+  </div>
+</div>
+
+<header class="hdr"><div class="hdr-in"><div><div class="hdr-left"><span style="font-size:24px">⛰️</span><h1>Trail Weather Advisor</h1></div><div class="sub">Weather-smart recommendations for serious day hikers</div></div><button class="gear" onclick="openModal()" title="Settings">⚙️</button></div></header>
+
+<main class="mn">
+  <div class="swrap" id="swrap"><div class="sbox" id="sbox"><span style="font-size:16px;opacity:.4">🔍</span><input type="text" id="sinput" placeholder="Search a location — e.g. Sedona AZ, Catskills NY..." autocomplete="off"><span id="sbusy" style="font-size:12px;color:var(--txmu);display:none">searching...</span></div><div class="gwarn" id="gwarn">Live search unavailable — showing matching presets.</div><div class="sdd" id="sdd"></div></div>
+  <div class="frow" id="frow"></div>
+  <div class="lh" id="lh"><div style="flex:1"><h2 id="locn"></h2><span class="rg" id="locr"></span></div><button class="svb" id="svb" onclick="toggleFav()">☆ Save</button></div>
+  <div class="ldg" id="ldg"><div class="li">⛰️</div><div id="ldgt">Fetching forecast...</div></div>
+  <div class="erb" id="erb"><div class="em" id="erm"></div><button onclick="doRetry()">Retry</button></div>
+  <div id="empty"><div class="emp"><div class="big">🥾</div><h2>Where are you hiking?</h2><p>Search for a location or pick a popular area below for a 7-day forecast with trail scores, hourly breakdowns, and AI trail recommendations.</p></div><div id="keyBnr" style="text-align:center;margin-bottom:18px"></div><div class="pttl">Popular Hiking Areas</div><div class="pgr" id="pgr"></div></div>
+  <div id="wxc" style="display:none"><div class="drow" id="drow"></div><div id="ddet" class="dt"></div></div>
+</main>
+<footer class="footer">Weather data from Open-Meteo · AI via Claude API · Built for serious hikers</footer>
+
+<script>
+var favs=[],curLoc=null,wxDays=null,selIdx=0,aiCache={},apiKey="";
+
+var PRESETS=[
+  {name:"Sedona",admin1:"Arizona",country:"US",latitude:34.8697,longitude:-111.7610,elevation:1320},
+  {name:"Catskills (Hunter)",admin1:"New York",country:"US",latitude:42.1776,longitude:-74.2309,elevation:500},
+  {name:"Catskills (Slide Mt)",admin1:"New York",country:"US",latitude:42.0069,longitude:-74.3862,elevation:800},
+  {name:"Catskills (Blackhead)",admin1:"New York",country:"US",latitude:42.2440,longitude:-74.0654,elevation:600},
+  {name:"Catskills (Kaaterskill)",admin1:"New York",country:"US",latitude:42.1975,longitude:-74.0586,elevation:360},
+  {name:"White Mountains",admin1:"New Hampshire",country:"US",latitude:44.2706,longitude:-71.3033,elevation:600},
+  {name:"Zion National Park",admin1:"Utah",country:"US",latitude:37.2982,longitude:-113.0263,elevation:1200},
+  {name:"Grand Canyon",admin1:"Arizona",country:"US",latitude:36.0544,longitude:-112.1401,elevation:2100},
+  {name:"Rocky Mountain NP",admin1:"Colorado",country:"US",latitude:40.3428,longitude:-105.6836,elevation:2400},
+  {name:"Yosemite Valley",admin1:"California",country:"US",latitude:37.7459,longitude:-119.5332,elevation:1200},
+  {name:"Great Smoky Mtns",admin1:"Tennessee",country:"US",latitude:35.6532,longitude:-83.5070,elevation:500},
+  {name:"Acadia NP",admin1:"Maine",country:"US",latitude:44.3386,longitude:-68.2733,elevation:100},
+  {name:"Mount Rainier",admin1:"Washington",country:"US",latitude:46.8523,longitude:-121.7603,elevation:1600},
+  {name:"Joshua Tree",admin1:"California",country:"US",latitude:33.8734,longitude:-115.9010,elevation:790}
+];
+
+var WMO={0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Foggy",48:"Rime fog",51:"Light drizzle",53:"Moderate drizzle",55:"Dense drizzle",61:"Slight rain",63:"Moderate rain",65:"Heavy rain",66:"Light freezing rain",67:"Heavy freezing rain",71:"Slight snow",73:"Moderate snow",75:"Heavy snow",77:"Snow grains",80:"Slight showers",81:"Moderate showers",82:"Violent showers",85:"Light snow showers",86:"Heavy snow showers",95:"Thunderstorm",96:"T-storm w/ hail",99:"T-storm w/ heavy hail"};
+
+function wI(c){if(c==null)return"❓";if(c<=1)return"☀️";if(c<=3)return"⛅";if(c<=48)return"🌫️";if(c<=55)return"🌦️";if(c<=65)return"🌧️";if(c<=67)return"🥶";if(c<=77)return"🌨️";if(c<=82)return"🌧️";if(c<=86)return"🌨️";return"⛈️";}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+function computeScore(d){
+  var s=100,iss=[],pos=[];var avg=(d.tmax+d.tmin)/2;
+  if(avg>=45&&avg<=70)pos.push("Ideal temperature range");
+  else if(d.tmax>90){s-=30;iss.push("Dangerously hot — heat exhaustion risk on steep climbs");}
+  else if(d.tmax>85){s-=20;iss.push("Very warm — start early, carry extra water");}
+  else if(d.tmax>78){s-=10;iss.push("Warm — pace yourself on uphill sections");}
+  else if(d.tmin<20){s-=25;iss.push("Very cold — hypothermia risk, possible ice");}
+  else if(d.tmin<32){s-=10;iss.push("Below freezing early — watch for ice on trails");}
+  if(d.pprob<10)pos.push("Dry conditions expected");
+  else if(d.pprob>70){s-=25;iss.push("High precipitation ("+d.pprob+"%) — wet, slippery trails");}
+  else if(d.pprob>40){s-=12;iss.push("Moderate rain chance ("+d.pprob+"%) — bring rain gear");}
+  else if(d.pprob>20){s-=5;iss.push("Slight rain chance ("+d.pprob+"%)");}
+  if(d.psum>0.5){s-=10;iss.push("Significant accumulation — muddy conditions likely");}
+  if(d.wmax<10)pos.push("Calm winds");
+  else if(d.gmax>45){s-=30;iss.push("Dangerous gusts to "+Math.round(d.gmax)+" mph — avoid exposed ridges");}
+  else if(d.gmax>30){s-=15;iss.push("Strong gusts to "+Math.round(d.gmax)+" mph — caution on ridgelines");}
+  else if(d.wmax>20){s-=8;iss.push("Breezy ("+Math.round(d.wmax)+" mph) — may affect balance");}
+  if(d.uvmax>8){s-=10;iss.push("Very high UV ("+d.uvmax.toFixed(1)+") — sunburn risk on exposed trails");}
+  else if(d.uvmax>5){s-=3;iss.push("Moderate-high UV ("+d.uvmax.toFixed(1)+") — wear sunscreen");}
+  else pos.push("Low UV exposure risk");
+  var wc=d.wcode||0;
+  if(wc>=95){s-=30;iss.push("Thunderstorms — do NOT hike exposed terrain");}
+  else if(wc>=66&&wc<=67){s-=20;iss.push("Freezing rain — extremely dangerous");}
+  else if(wc>=71&&wc<=77){s-=15;iss.push("Snow expected — traction may be needed");}
+  s=Math.max(0,Math.min(100,s));var c,l;
+  if(s>=85){c="#4a7c59";l="Excellent";}else if(s>=70){c="#6b8c42";l="Good";}
+  else if(s>=50){c="#b8860b";l="Fair";}else if(s>=30){c="#c45a3c";l="Poor";}
+  else{c="#8b2500";l="Avoid";}
+  return{score:s,color:c,label:l,issues:iss,positives:pos};
+}
+
+function bestWin(hrs){
+  if(!hrs||!hrs.length)return null;var bs=6,bsc=-1;
+  for(var s=5;s<=14;s++){var ws=0;for(var h=s;h<Math.min(s+5,hrs.length);h++){var hr=hrs[h];if(!hr)continue;var sc=20;if(hr.pp>40)sc-=8;if(hr.ws>20)sc-=5;if(hr.t>=45&&hr.t<=72)sc+=5;if((hr.uv||0)<6)sc+=2;ws+=sc;}if(ws>bsc){bsc=ws;bs=s;}}
+  var end=Math.min(bs+5,20);function fmt(h){return(h%12||12)+":00 "+(h>=12?"PM":"AM");}return fmt(bs)+" – "+fmt(end);
+}
+
+function getTips(d){
+  var t=[],sc=d.hike.score;
+  if(sc>=85)t.push("Outstanding conditions for an aggressive day hike. Push for summit goals.");
+  else if(sc>=70)t.push("Solid hiking day. Good for challenging routes with preparation.");
+  else if(sc>=50)t.push("Hikeable but plan carefully. Consider shorter or lower-elevation routes.");
+  else t.push("Conditions are challenging. Choose sheltered, low-elevation trails.");
+  if(d.wmax>25)t.push("Avoid exposed ridgelines and above-treeline sections.");
+  if(d.pprob>50)t.push("Waterproof layers essential. Watch for flash flood zones in canyons.");
+  if(d.tmax>85)t.push("Start at dawn. Carry 3L+ water. Electrolytes for steep ascents.");
+  if(d.tmin<32)t.push("Microspikes recommended. Watch for black ice on north-facing slopes.");
+  if(d.uvmax>7)t.push("High UV — seek shaded trails or limit ridge exposure to early morning.");
+  if(d.win)t.push("Best hiking window: "+d.win);return t;
+}
+
+function scbHTML(h,lg){var c=lg?"scb lg":"scb";return'<div class="'+c+'" style="background:'+h.color+'15"><span class="sn2" style="color:'+h.color+'">'+h.score+'</span><span class="sl" style="color:'+h.color+'">'+h.label+'</span></div>';}
+
+// ═══════════════════════════════════════
+// API: Geocoding + Weather (Open-Meteo)
+// ═══════════════════════════════════════
+function geocodeAPI(q){
+  return fetch("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(q)+"&count=8&language=en&format=json")
+    .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+    .then(function(d){return{ok:true,results:d.results||[]};})
+    .catch(function(e){return{ok:false,error:e.message,results:[]};});
+}
+
+function weatherAPI(lat,lon){
+  var hp=["temperature_2m","relative_humidity_2m","apparent_temperature","precipitation_probability","precipitation","weather_code","cloud_cover","visibility","wind_speed_10m","wind_gusts_10m","uv_index"].join(",");
+  var dp=["temperature_2m_max","temperature_2m_min","apparent_temperature_max","apparent_temperature_min","precipitation_sum","precipitation_probability_max","wind_speed_10m_max","wind_gusts_10m_max","uv_index_max","weather_code","sunrise","sunset"].join(",");
+  return fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&hourly="+hp+"&daily="+dp+"&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=7")
+    .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+    .then(function(d){return{ok:true,data:d};})
+    .catch(function(e){return{ok:false,error:e.message};});
+}
+
+function parseWx(data){
+  return data.daily.time.map(function(date,i){
+    var hrs=[];
+    for(var h=0;h<24;h++){var idx=i*24+h;if(idx<(data.hourly&&data.hourly.time?data.hourly.time.length:0)){hrs.push({time:data.hourly.time[idx],t:data.hourly.temperature_2m[idx],at:data.hourly.apparent_temperature[idx],rh:data.hourly.relative_humidity_2m[idx],pp:data.hourly.precipitation_probability[idx],pr:data.hourly.precipitation[idx],wc:data.hourly.weather_code[idx],cc:data.hourly.cloud_cover[idx],vis:data.hourly.visibility[idx],ws:data.hourly.wind_speed_10m[idx],wg:data.hourly.wind_gusts_10m[idx],uv:data.hourly.uv_index[idx]});}}
+    var sr=data.daily.sunrise[i]?new Date(data.daily.sunrise[i]).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}):"";
+    var ss=data.daily.sunset[i]?new Date(data.daily.sunset[i]).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}):"";
+    var d={date:date,hrs:hrs,disp:new Date(date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}),tmax:data.daily.temperature_2m_max[i],tmin:data.daily.temperature_2m_min[i],atmax:data.daily.apparent_temperature_max[i],psum:data.daily.precipitation_sum[i],pprob:data.daily.precipitation_probability_max[i],wmax:data.daily.wind_speed_10m_max[i],gmax:data.daily.wind_gusts_10m_max[i],uvmax:data.daily.uv_index_max[i],wcode:data.daily.weather_code[i],sr:sr,ss:ss};
+    d.hike=computeScore(d);d.win=bestWin(hrs);return d;
+  });
+}
+
+// ═══════════════════════════════════════
+// API: Claude AI Trail Advisor
+// ═══════════════════════════════════════
+function callAI(day,locName){
+  if(!apiKey)return Promise.resolve(null);
+  var prompt='You are an expert hiking advisor. A hiker is planning an intense day hike (high elevation gain, aggressive inclines, 4-8 hours) near '+locName+'.\n\nWeather for '+day.disp+':\n- High: '+day.tmax+'°F, Low: '+day.tmin+'°F, Feels like: '+day.atmax+'°F\n- Precipitation: '+day.pprob+'% chance, '+day.psum+'" expected\n- Wind: '+day.wmax+' mph, gusts '+day.gmax+' mph\n- UV: '+day.uvmax+', Weather: '+(WMO[day.wcode]||"Unknown")+'\n- Sunrise: '+day.sr+', Sunset: '+day.ss+'\n- Hiking score: '+day.hike.score+'/100 ('+day.hike.label+')\n- Best window: '+day.win+'\n\nProvide TWO sections:\n\nSECTION 1 - TACTICAL ASSESSMENT:\nA concise tactical assessment in short paragraphs (no bullet points, no headers). Cover conditions for intense high-elevation day hiking, gear beyond basics, optimal timing, and safety warnings. Be specific to '+locName+'\'s geography.\n\nSECTION 2 - TRAIL SUGGESTIONS:\nAfter your assessment, output a JSON block with 3-5 trail suggestions. Format it EXACTLY like this, wrapped in <trails> tags:\n\n<trails>\n[{"name":"Trail Name","distance":"X miles","elevation":"X ft gain","difficulty":"Strenuous","why":"Brief reason this trail suits today\'s conditions","alltrails":"search terms for alltrails","webUrl":"URL to a webpage about this trail if you know one, otherwise empty string"}]\n</trails>\n\nFor alltrails field, provide good search terms. For webUrl, include a real URL to a hiking site, blog post, or park service page about this specific trail if you know one — otherwise leave as empty string. Suggest trails appropriate for an experienced hiker who wants aggressive inclines and significant elevation gain.';
+
+  return fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,messages:[{role:"user",content:prompt}]})
+  })
+  .then(function(r){
+    if(r.status===401)throw new Error("Invalid API key. Check your key in Settings.");
+    if(!r.ok)throw new Error("API error: HTTP "+r.status);
+    return r.json();
+  })
+  .then(function(data){
+    var text=(data.content||[]).map(function(b){return b.text||"";}).join("\n");
+    var trails=[];
+    var tm=text.match(/<trails>([\s\S]*?)<\/trails>/);
+    if(tm){try{trails=JSON.parse(tm[1].trim());}catch(e){}}
+    var assessment=text.replace(/<trails>[\s\S]*?<\/trails>/,"").trim();
+    return{assessment:assessment,trails:trails};
+  });
+}
+
+// ═══════════════════════════════════════
+// Settings Modal
+// ═══════════════════════════════════════
+function openModal(){document.getElementById("modal").classList.add("open");document.getElementById("keyIn").value=apiKey;document.getElementById("kst").textContent="";document.getElementById("keyIn").focus();}
+function closeModal(){document.getElementById("modal").classList.remove("open");}
+function saveKey(){
+  var k=document.getElementById("keyIn").value.trim();
+  if(k&&!k.startsWith("sk-ant")){document.getElementById("kst").innerHTML='<span style="color:var(--dng)">Key should start with sk-ant...</span>';return;}
+  apiKey=k;
+  try{localStorage.setItem("twx-key",k);}catch(e){}
+  document.getElementById("kst").innerHTML='<span style="color:var(--ac)">✓ Key saved</span>';
+  updateKeyBanner();
+  setTimeout(closeModal,800);
+}
+
+function updateKeyBanner(){
+  var el=document.getElementById("keyBnr");
+  if(!apiKey){el.innerHTML='<div style="display:inline-block;background:rgba(92,122,90,.06);border:1px solid rgba(92,122,90,.2);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--txm)">💡 Tap ⚙️ to add your <a href="https://console.anthropic.com/settings/keys" target="_blank">Anthropic API key</a> for AI trail recommendations</div>';}
+  else{el.innerHTML='<div style="display:inline-block;background:rgba(92,122,90,.06);border:1px solid rgba(92,122,90,.2);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--ac)">✓ AI Trail Advisor enabled</div>';}
+}
+
+// ═══════════════════════════════════════
+// Favorites
+// ═══════════════════════════════════════
+function loadFavs(){try{var s=localStorage.getItem("twx-favs");if(s)favs=JSON.parse(s);}catch(e){}drawFavs();}
+function saveFavs(){try{localStorage.setItem("twx-favs",JSON.stringify(favs));}catch(e){}drawFavs();}
+function drawFavs(){
+  var el=document.getElementById("frow");if(!favs.length){el.className="frow";return;}el.className="frow show";
+  el.innerHTML='<span class="flbl">Favorites:</span>'+favs.map(function(f,i){var act=curLoc&&curLoc.name===f.name&&curLoc.lat===f.lat?" act":"";return'<div class="fc'+act+'" onclick="pickFav('+i+')"><span>📍 '+esc(f.name)+'</span><span class="rx" onclick="event.stopPropagation();rmFav('+i+')">✕</span></div>';}).join("");
+}
+function toggleFav(){if(!curLoc)return;var idx=favs.findIndex(function(f){return f.name===curLoc.name&&f.lat===curLoc.lat;});if(idx>=0)favs.splice(idx,1);else favs.push({name:curLoc.name,lat:curLoc.lat,lon:curLoc.lon,region:curLoc.region,admin1:curLoc.admin1,country:curLoc.country});saveFavs();updSvb();}
+function rmFav(i){favs.splice(i,1);saveFavs();}
+function pickFav(i){var f=favs[i];selectLoc({name:f.name,latitude:f.lat,longitude:f.lon,admin1:f.admin1||"",country:f.country||""});}
+function updSvb(){var b=document.getElementById("svb");if(!curLoc)return;var is=favs.some(function(f){return f.name===curLoc.name&&f.lat===curLoc.lat;});b.className=is?"svb on":"svb";b.textContent=is?"★ Saved":"☆ Save";}
+
+// ═══════════════════════════════════════
+// Search
+// ═══════════════════════════════════════
+var stimer=null,searchRes=[];
+var sinput=document.getElementById("sinput"),sdd=document.getElementById("sdd");
+
+sinput.addEventListener("input",function(){
+  clearTimeout(stimer);var q=sinput.value.trim();
+  if(q.length<2){sdd.className="sdd";sdd.innerHTML="";document.getElementById("gwarn").style.display="none";return;}
+  document.getElementById("sbusy").style.display="inline";
+  stimer=setTimeout(function(){
+    geocodeAPI(q).then(function(geo){
+      if(geo.ok&&geo.results.length>0){searchRes=geo.results.slice(0,6);document.getElementById("gwarn").style.display="none";}
+      else{var lw=q.toLowerCase();searchRes=PRESETS.filter(function(p){return p.name.toLowerCase().indexOf(lw)>=0||(p.admin1||"").toLowerCase().indexOf(lw)>=0;});document.getElementById("gwarn").style.display=geo.ok?"none":"block";}
+      document.getElementById("sbusy").style.display="none";
+      if(searchRes.length>0){
+        sdd.innerHTML=searchRes.map(function(r,i){var rg=[r.admin1,r.country].filter(Boolean).join(", ");var el=r.elevation!=null?'<span class="el">'+Math.round(r.elevation*3.281).toLocaleString()+' ft</span>':"";return'<div class="si" data-i="'+i+'"><span class="nm">'+esc(r.name)+'</span><span class="rg">'+esc(rg)+'</span>'+el+'</div>';}).join("");
+        sdd.className="sdd open";
+        sdd.querySelectorAll(".si").forEach(function(el){el.addEventListener("click",function(){var idx=parseInt(this.getAttribute("data-i"));selectLoc(searchRes[idx]);sinput.value="";sdd.className="sdd";});});
+      }else sdd.className="sdd";
+    });
+  },350);
+});
+sinput.addEventListener("focus",function(){document.getElementById("sbox").classList.add("fo");if(sdd.children.length>0)sdd.className="sdd open";});
+document.addEventListener("click",function(e){if(!document.getElementById("swrap").contains(e.target)){sdd.className="sdd";document.getElementById("sbox").classList.remove("fo");}});
+
+// ═══════════════════════════════════════
+// Select Location & Fetch Weather
+// ═══════════════════════════════════════
+function selectLoc(geo){
+  curLoc={name:geo.name,lat:geo.latitude,lon:geo.longitude,region:[geo.admin1,geo.country].filter(Boolean).join(", "),admin1:geo.admin1||"",country:geo.country||""};
+  selIdx=0;aiCache={};
+  document.getElementById("empty").style.display="none";
+  document.getElementById("wxc").style.display="none";
+  document.getElementById("erb").style.display="none";
+  document.getElementById("lh").className="lh";
+  document.getElementById("ldg").style.display="block";
+  document.getElementById("ldgt").textContent="Fetching forecast for "+curLoc.name+"...";
+  drawFavs();
+
+  weatherAPI(curLoc.lat,curLoc.lon).then(function(res){
+    document.getElementById("ldg").style.display="none";
+    if(res.ok&&res.data&&res.data.daily){
+      try{wxDays=parseWx(res.data);renderWx();}
+      catch(e){showErr("Parse error: "+e.message);}
+    }else showErr("Failed to fetch weather"+(res.error?": "+res.error:"")+". Check your connection.");
+  });
+}
+function doRetry(){if(curLoc)selectLoc({name:curLoc.name,latitude:curLoc.lat,longitude:curLoc.lon,admin1:curLoc.admin1,country:curLoc.country});}
+function showErr(m){document.getElementById("erb").style.display="block";document.getElementById("erm").textContent=m;}
+
+// ═══════════════════════════════════════
+// Render Weather
+// ═══════════════════════════════════════
+function renderWx(){
+  if(!wxDays)return;
+  document.getElementById("locn").textContent=curLoc.name;
+  document.getElementById("locr").textContent=curLoc.region||"";
+  document.getElementById("lh").className="lh show";updSvb();
+  var bestI=0;wxDays.forEach(function(d,i){if(d.hike.score>wxDays[bestI].hike.score)bestI=i;});
+  var row=document.getElementById("drow");
+  row.innerHTML=wxDays.map(function(day,i){
+    var dt=new Date(day.date+"T12:00:00");var dn=dt.toLocaleDateString("en-US",{weekday:"short"});var md=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+    return'<div class="dc'+(i===selIdx?" sel":"")+'" onclick="pickDay('+i+')" id="dc'+i+'">'+(i===bestI?'<div class="bb">Best Day</div>':'')+'<div class="dn">'+dn+'</div><div class="dd">'+md+'</div><div class="wi">'+wI(day.wcode)+'</div><div class="tm">'+Math.round(day.tmax)+'° / '+Math.round(day.tmin)+'°</div><div style="margin-top:5px">'+scbHTML(day.hike,false)+'</div>'+(day.pprob>20?'<div class="pp">💧 '+day.pprob+'%</div>':'')+'</div>';
+  }).join("");
+  document.getElementById("wxc").style.display="block";
+  document.getElementById("empty").style.display="none";
+  document.getElementById("erb").style.display="none";
+  renderDetail();
+}
+
+function pickDay(i){selIdx=i;document.querySelectorAll(".dc").forEach(function(el,j){el.classList.toggle("sel",j===i);});renderDetail();}
+
+function renderDetail(){
+  var day=wxDays[selIdx],tips=getTips(day),el=document.getElementById("ddet");
+  var stats=[["High / Low",Math.round(day.tmax)+"° / "+Math.round(day.tmin)+"°F"],["Feels Like",Math.round(day.atmax)+"°F"],["Precipitation",day.pprob+"% · "+day.psum+'"'],["Wind",Math.round(day.wmax)+" mph, gusts "+Math.round(day.gmax)],["UV Index",(day.uvmax||0).toFixed(1)],["Sun",day.sr+" – "+day.ss]];
+
+  var winH=day.win?'<div class="wbn"><strong>⏰ Best Hiking Window: </strong>'+day.win+'</div>':"";
+  var posH=day.hike.positives.length?'<div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:4px">'+day.hike.positives.map(function(p){return'<span class="pt">✓ '+p+'</span>';}).join("")+'</div>':"";
+  var issH=day.hike.issues.length?'<div style="margin-bottom:10px">'+day.hike.issues.map(function(s){return'<div class="iss">⚠ '+s+'</div>';}).join("")+'</div>':"";
+  var tipH=tips.map(function(t){return'<p class="tip">'+t+'</p>';}).join("");
+
+  // AI section
+  var cached=aiCache[selIdx];
+  var aiH;
+  if(cached){
+    aiH='<div class="aiout">'+formatAI(cached.assessment)+'</div>';
+    if(cached.trails&&cached.trails.length)aiH+=renderTrails(cached.trails);
+  }else if(!apiKey){
+    aiH='<p style="font-size:12px;color:var(--txmu);margin:6px 0 0">Add your Anthropic API key in ⚙️ Settings to enable AI trail recommendations.</p>';
+  }else{
+    aiH='<button class="aibtn" id="aibtn" onclick="runAI()">Get AI Advice for '+esc(curLoc.name)+'</button><p style="font-size:11.5px;color:var(--txmu);margin-top:6px">Area-specific trail recommendations powered by Claude.</p>';
+  }
+
+  // Hourly
+  var hrows=day.hrs.map(function(hr){
+    var t=new Date(hr.time);var h=t.getHours();var lbl=h===0?"12 AM":h<12?h+" AM":h===12?"12 PM":(h-12)+" PM";
+    var ni=h<6||h>20?" ni":"";
+    return'<div class="hrow'+ni+'"><span class="ht2">'+lbl+'</span><span style="font-size:14px">'+wI(hr.wc)+'</span><span>'+Math.round(hr.t)+'°F</span><span style="color:'+(hr.pp>40?"var(--dng)":"var(--txmu)")+'">💧 '+hr.pp+'%</span><span style="color:'+(hr.ws>20?"var(--dng)":"var(--txmu)")+'">💨 '+Math.round(hr.ws)+'</span><span style="color:'+((hr.uv||0)>6?"var(--dng)":"var(--txmu)")+'">'+(hr.uv||0).toFixed(1)+'</span><span style="color:var(--txmu)">'+Math.round(hr.rh)+'%</span></div>';
+  }).join("");
+
+  el.innerHTML=
+    '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px"><div style="flex:1 1 260px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:40px">'+wI(day.wcode)+'</span><div><h3 style="font-family:var(--sf);font-size:22px;font-weight:700">'+day.disp+'</h3><div style="font-size:12.5px;color:var(--txmu)">'+(WMO[day.wcode]||"")+'</div></div></div>'+scbHTML(day.hike,true)+'</div><div style="flex:1 1 220px;display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;font-size:13px">'+stats.map(function(s){return'<div><div class="stl" style="color:var(--txmu);font-size:10px;text-transform:uppercase;letter-spacing:.6px">'+s[0]+'</div><div style="color:var(--tx);font-weight:500;margin-top:1px">'+s[1]+'</div></div>';}).join("")+'</div></div>'+
+    winH+
+    '<div class="icd"><h4>Trail Conditions Assessment</h4>'+posH+issH+'<div class="divr">'+tipH+'</div></div>'+
+    '<div class="icd"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:'+(cached?'12':'0')+'px"><h4 style="margin:0">🤖 AI Trail Advisor</h4></div>'+aiH+'</div>'+
+    '<div class="hw"><h4>Hourly Breakdown</h4><div class="hs"><div class="htbl"><div class="hh"><span>Time</span><span></span><span>Temp</span><span>Precip</span><span>Wind</span><span>UV</span><span>Humid</span></div><div class="hbd">'+hrows+'</div></div></div></div>';
+}
+
+function formatAI(text){
+  return text.split("\n\n").map(function(p){
+    p=p.trim();if(!p)return"";
+    return"<p>"+esc(p).replace(/\n/g,"<br>")+"</p>";
+  }).join("");
+}
+
+function renderTrails(trails){
+  if(!trails||!trails.length)return"";
+  return'<div class="icd" style="margin-top:12px;margin-bottom:0;padding:16px"><h4>🥾 Suggested Trails</h4>'+
+    trails.map(function(t){
+      var stats=[];
+      if(t.distance)stats.push(t.distance);
+      if(t.elevation)stats.push(t.elevation);
+      if(t.difficulty)stats.push(t.difficulty);
+      var links='<div class="trl-links"><a href="https://www.alltrails.com/search?q='+encodeURIComponent(t.alltrails||t.name)+'" target="_blank" rel="noopener">AllTrails ↗</a><a href="https://www.google.com/search?q='+encodeURIComponent(t.name+" hiking trail")+'" target="_blank" rel="noopener">Google ↗</a>';
+      if(t.webUrl)links+='<a href="'+esc(t.webUrl)+'" target="_blank" rel="noopener">Info ↗</a>';
+      links+='</div>';
+      return'<div class="trl-item"><div class="trl-name">'+esc(t.name)+'</div>'+(stats.length?'<div class="trl-stats">'+esc(stats.join(" · "))+'</div>':'')+(t.why?'<div class="trl-why">'+esc(t.why)+'</div>':'')+links+'</div>';
+    }).join("")+'</div>';
+}
+
+function runAI(){
+  var btn=document.getElementById("aibtn");
+  if(btn){btn.disabled=true;btn.textContent="Analyzing conditions...";}
+  var day=wxDays[selIdx];
+  callAI(day,curLoc.name).then(function(result){
+    if(result){aiCache[selIdx]=result;renderDetail();}
+    else{renderDetail();}
+  }).catch(function(e){
+    var el=document.getElementById("aibtn");
+    if(el){el.disabled=false;el.textContent="Retry AI Advice";}
+    // Show error inline
+    var par=el?el.parentElement:null;
+    if(par){var err=document.createElement("div");err.style.cssText="font-size:12.5px;color:var(--dng);margin-top:8px";err.textContent=e.message;par.appendChild(err);}
+  });
+}
+
+// ═══════════════════════════════════════
+// Init
+// ═══════════════════════════════════════
+function init(){
+  // Load API key
+  try{apiKey=localStorage.getItem("twx-key")||"";}catch(e){}
+  updateKeyBanner();
+
+  // Render presets
+  document.getElementById("pgr").innerHTML=PRESETS.map(function(p,i){
+    return'<div class="pcd" onclick="selectLoc(PRESETS['+i+'])"><div class="pn">⛰️ '+esc(p.name)+'</div><div class="pr">'+esc(p.admin1)+', '+esc(p.country)+'</div></div>';
+  }).join("");
+
+  loadFavs();
+}
+init();
+</script>
+</body>
+</html>
