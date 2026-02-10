@@ -428,8 +428,8 @@ function callTripAI(selectedDays,energyMap,lodging,notes){
 
 function sendTripChat(msg){
   if(!apiKey)return;var sys=buildTripSystem();
-  tripChat.push({role:"user",content:msg});
-  return claudeAPI(sys,tripChat.slice(-10),2000).then(function(text){
+  tripChat.push({role:"user",content:msg+'\n\nIMPORTANT: You MUST respond with an updated trip plan in <tripplan> JSON tags using the same format as before, with dayIndex, dayLabel, advice, and trails array (including name, distance, elevation, difficulty, why, alltrails with location, webUrl, crowdLevel, driveTime). Always include the full updated plan, not just the changes.'});
+  return claudeAPI(sys,tripChat.slice(-10),2500).then(function(text){
     tripChat.push({role:"assistant",content:text});return text;
   });
 }
@@ -662,12 +662,31 @@ function handleTripChat(){
   input.value="";input.disabled=true;btn.disabled=true;btn.textContent="...";
   var container=document.getElementById("tripchatmsgs");
   if(!container){var inputRow=input.closest(".chat-input-row");container=document.createElement("div");container.className="chat-msgs";container.id="tripchatmsgs";inputRow.parentNode.insertBefore(container,inputRow);}
-  container.innerHTML+='<div class="chat-msg user">'+esc(msg)+'</div><div class="chat-msg ai" id="tripchatloading" style="color:var(--txmu)">Thinking...</div>';
+  container.innerHTML+='<div class="chat-msg user">'+esc(msg)+'</div><div class="chat-msg ai" id="tripchatloading" style="color:var(--txmu)">Updating plan...</div>';
   container.scrollTop=container.scrollHeight;
   sendTripChat(msg).then(function(text){
-    var ldg=document.getElementById("tripchatloading");
-    if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+formatAI(text)+'</div>';
-    input.disabled=false;btn.disabled=false;btn.textContent="Send";input.focus();
+    // Check if response contains a new trip plan
+    var tm=text.match(/<tripplan>([\s\S]*?)<\/tripplan>/);
+    if(tm){
+      try{
+        var newDays=JSON.parse(tm[1].trim());
+        var overview=text.replace(/<tripplan>[\s\S]*?<\/tripplan>/,"").trim();
+        tripPlan={overview:overview||tripPlan.overview,days:newDays};
+        // Re-render the entire trip planner section with updated plan
+        renderTripPlanner();
+      }catch(e){
+        // JSON parse failed, fall back to showing raw text
+        var ldg=document.getElementById("tripchatloading");
+        if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+formatAI(text)+'</div>';
+      }
+    }else{
+      // No tripplan tags, just show the text response
+      var ldg=document.getElementById("tripchatloading");
+      if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+formatAI(text)+'</div>';
+    }
+    input=document.getElementById("tripchatinput");btn=document.getElementById("tripchatsend");
+    if(input){input.disabled=false;}if(btn){btn.disabled=false;btn.textContent="Send";}
+    if(input)input.focus();
     var c=document.getElementById("tripchatmsgs");if(c)c.scrollTop=c.scrollHeight;
   }).catch(function(e){
     var ldg=document.getElementById("tripchatloading");
