@@ -172,6 +172,28 @@ a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
 .mdl .sts{font-size:11.5px;margin-top:6px}
 
 .footer{text-align:center;padding:18px;font-size:11px;color:var(--txl);border-top:1px solid var(--bdl)}
+
+/* Gear Checklist */
+.gear-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.gear-item{font-size:12px;padding:4px 10px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
+.gear-item.essential{background:rgba(196,90,60,.07);color:#8b4513;border:1px solid rgba(196,90,60,.15)}
+.gear-item.recommended{background:rgba(92,122,90,.07);color:#4a7c59;border:1px solid rgba(92,122,90,.15)}
+.gear-item.optional{background:rgba(154,142,125,.07);color:var(--txmu);border:1px solid var(--bdl)}
+
+/* Elevation Toggle */
+.elev-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:rgba(92,122,90,.04);border:1px solid rgba(92,122,90,.12);border-radius:9px;font-size:12.5px}
+.elev-bar label{font-weight:600;color:var(--txm)}
+.elev-bar input[type=number]{width:70px;padding:4px 8px;border:1.5px solid var(--bd);border-radius:6px;font-size:12px;text-align:center;background:var(--card);color:var(--tx)}
+.elev-bar .elev-note{font-size:11px;color:var(--txmu);flex-basis:100%}
+.elev-toggle{position:relative;width:40px;height:22px;border-radius:11px;background:var(--bd);cursor:pointer;transition:background .2s;flex-shrink:0}
+.elev-toggle.on{background:var(--ac)}
+.elev-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.elev-toggle.on::after{transform:translateX(18px)}
+
+/* Share Button */
+.share-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ac);border:1px solid rgba(92,122,90,.3);border-radius:7px;padding:6px 14px;cursor:pointer;transition:all .2s;background:transparent}
+.share-btn:hover{background:rgba(92,122,90,.06)}
+
 @media(max-width:600px){.hdr h1{font-size:19px}.dc{width:102px}}
 </style>
 </head>
@@ -605,7 +627,7 @@ function runTripAI(){
 
 function renderTripPlan(){
   if(!tripPlan)return"";
-  var html='<div class="tp-out">';
+  var html='<div class="tp-out"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-weight:700;font-size:14px">Your Trip Plan</div><button class="share-btn" id="sharebtn" onclick="shareTripPlan()">📤 Share Plan</button></div>';
   if(tripPlan.overview)html+='<div style="font-size:13px;line-height:1.6;margin-bottom:14px">'+formatAI(tripPlan.overview)+'</div>';
   if(tripPlan.days&&tripPlan.days.length){
     tripPlan.days.forEach(function(day){
@@ -656,6 +678,127 @@ function handleTripChat(){
 function pickDay(i){selIdx=i;document.querySelectorAll(".dc").forEach(function(el,j){el.classList.toggle("sel",j===i);});renderDetail();}
 
 // ═══════════════════════════════════════
+// Gear Checklist
+// ═══════════════════════════════════════
+function buildGearList(day){
+  var g={essential:[],recommended:[],optional:[]};
+  // Always
+  g.essential.push("Water (2-3L)","Trail shoes","Navigation (phone/map)");
+  // Temperature
+  if(day.tmin<32){g.essential.push("Microspikes","Insulated layers","Warm gloves","Beanie");g.recommended.push("Hand warmers","Thermos w/ hot drink");}
+  else if(day.tmin<45){g.essential.push("Fleece midlayer","Light gloves");g.recommended.push("Warm hat");}
+  else if(day.tmax>85){g.essential.push("Extra water (+1L)","Electrolytes","Sun hat");g.recommended.push("Cooling towel","Salty snacks");}
+  else if(day.tmax>75){g.recommended.push("Sun hat","Electrolytes");}
+  // Precipitation
+  if(day.pprob>50){g.essential.push("Rain jacket","Pack cover");g.recommended.push("Rain pants","Dry bags for electronics");}
+  else if(day.pprob>25){g.recommended.push("Packable rain shell");}
+  // Wind
+  if(day.gmax>30){g.essential.push("Wind shell","Secure hat/buff");g.recommended.push("Balaclava");}
+  else if(day.wmax>15){g.recommended.push("Wind layer");}
+  // UV
+  if(day.uvmax>7){g.essential.push("SPF 50+ sunscreen","UV sunglasses");g.recommended.push("UPF shirt","Lip balm w/ SPF");}
+  else if(day.uvmax>4){g.recommended.push("Sunscreen","Sunglasses");}
+  // Snow
+  if(day.wcode>=71&&day.wcode<=77){g.essential.push("Gaiters","Traction devices");g.recommended.push("Trekking poles");}
+  // Thunderstorms
+  if(day.wcode>=95){g.essential.push("Emergency shelter/bivy");g.recommended.push("Lightning safety knowledge");}
+  // General
+  g.recommended.push("First aid kit","Headlamp");
+  g.optional.push("Trekking poles","Camera","Emergency whistle","Sit pad");
+  return g;
+}
+
+function renderGearChecklist(day){
+  var g=buildGearList(day);
+  var html='<div class="icd"><h4>🎒 Gear Checklist</h4>';
+  html+='<div style="font-size:11px;color:var(--txmu);margin-bottom:8px">Based on today\'s conditions. Beyond your usual kit:</div>';
+  if(g.essential.length){html+='<div style="font-size:11px;font-weight:600;color:#8b4513;margin-bottom:4px">ESSENTIAL</div><div class="gear-list">'+g.essential.map(function(i){return'<span class="gear-item essential">'+esc(i)+'</span>';}).join("")+'</div>';}
+  if(g.recommended.length){html+='<div style="font-size:11px;font-weight:600;color:#4a7c59;margin:8px 0 4px">RECOMMENDED</div><div class="gear-list">'+g.recommended.map(function(i){return'<span class="gear-item recommended">'+esc(i)+'</span>';}).join("")+'</div>';}
+  if(g.optional.length){html+='<div style="font-size:11px;font-weight:600;color:var(--txmu);margin:8px 0 4px">OPTIONAL</div><div class="gear-list">'+g.optional.map(function(i){return'<span class="gear-item optional">'+esc(i)+'</span>';}).join("")+'</div>';}
+  html+='</div>';return html;
+}
+
+// ═══════════════════════════════════════
+// Elevation-Adjusted Weather
+// ═══════════════════════════════════════
+var elevGain=2500,elevOn=false;
+function elevAdj(day){
+  if(!elevOn||!elevGain)return null;
+  var lapse=3.5*(elevGain/1000);// °F per 1000ft
+  var windMult=1+0.3*(elevGain/2000);// rough wind increase
+  return{
+    tmax:Math.round(day.tmax-lapse),tmin:Math.round(day.tmin-lapse),
+    atmax:Math.round(day.atmax-lapse-2),// wind chill adds ~2°F
+    wmax:Math.round(day.wmax*windMult),gmax:Math.round(day.gmax*windMult),
+    uvmax:+(day.uvmax*(1+0.06*(elevGain/1000))).toFixed(1)// ~6% UV increase per 1000ft
+  };
+}
+function renderElevBar(day){
+  var adj=elevAdj(day);
+  var html='<div class="elev-bar"><label>⛰️ Summit Estimate</label><div class="elev-toggle'+(elevOn?" on":"")+'" onclick="elevOn=!elevOn;renderDetail()"></div>';
+  if(elevOn){
+    html+='<span>Elev gain:</span><input type="number" value="'+elevGain+'" step="500" min="500" max="8000" onchange="elevGain=parseInt(this.value)||2500;renderDetail()">';
+    html+='<span>ft</span>';
+    if(adj)html+='<div class="elev-note">At summit: ~'+adj.tmax+'°/'+adj.tmin+'°F, feels '+adj.atmax+'°F, wind '+adj.wmax+' mph (gusts '+adj.gmax+'), UV '+adj.uvmax+'</div>';
+  }else{
+    html+='<span style="color:var(--txmu);font-size:11px">Toggle to see estimated ridgeline conditions</span>';
+  }
+  html+='</div>';return html;
+}
+
+// ═══════════════════════════════════════
+// Share Trip Plan
+// ═══════════════════════════════════════
+function buildShareText(){
+  if(!tripPlan||!tripPlan.days||!tripPlan.days.length)return null;
+  var lines=["🥾 HIKING TRIP PLAN — "+curLoc.name,""];
+  if(tripPlan.overview)lines.push(tripPlan.overview.replace(/<[^>]+>/g,""),"");
+  tripPlan.days.forEach(function(day){
+    var wxDay=wxDays[day.dayIndex];
+    lines.push("━━━━━━━━━━━━━━━━━━━━");
+    lines.push("📅 "+day.dayLabel);
+    if(wxDay)lines.push("🌤️ "+Math.round(wxDay.tmax)+"°/"+Math.round(wxDay.tmin)+"°F · "+(WMO[wxDay.wcode]||"")+" · Score: "+wxDay.hike.score+"/100 · "+wxDay.win);
+    if(day.advice)lines.push("",day.advice.replace(/<[^>]+>/g,""));
+    if(day.trails&&day.trails.length){
+      lines.push("");
+      day.trails.forEach(function(t){
+        var info=t.name;
+        if(t.distance)info+=" · "+t.distance;if(t.elevation)info+=" · "+t.elevation;if(t.difficulty)info+=" ("+t.difficulty+")";
+        if(t.crowdLevel)info+=" · Crowds: "+t.crowdLevel;
+        if(t.driveTime)info+=" · 🚗 "+t.driveTime;
+        lines.push("  🥾 "+info);
+        if(t.why)lines.push("     "+t.why);
+        var sn=t.alltrails||t.name+" "+curLoc.name;
+        lines.push("     AllTrails: https://www.google.com/search?q="+encodeURIComponent(sn+" alltrails"));
+      });
+    }
+    lines.push("");
+  });
+  lines.push("━━━━━━━━━━━━━━━━━━━━");
+  lines.push("Generated by Trail Weather Advisor");
+  lines.push("https://altrugold.github.io/Trail-Weather-/");
+  return lines.join("\n");
+}
+
+function shareTripPlan(){
+  var text=buildShareText();
+  if(!text){alert("No trip plan to share. Build one first.");return;}
+  if(navigator.share){
+    navigator.share({title:"Hiking Trip Plan — "+curLoc.name,text:text}).catch(function(){});
+  }else{
+    navigator.clipboard.writeText(text).then(function(){
+      var btn=document.getElementById("sharebtn");
+      if(btn){btn.textContent="✓ Copied!";setTimeout(function(){btn.textContent="📤 Share Plan";},2000);}
+    }).catch(function(){
+      // Fallback: select all in a textarea
+      var ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);
+      var btn=document.getElementById("sharebtn");
+      if(btn){btn.textContent="✓ Copied!";setTimeout(function(){btn.textContent="📤 Share Plan";},2000);}
+    });
+  }
+}
+
+// ═══════════════════════════════════════
 // Render Day Detail
 // ═══════════════════════════════════════
 function renderDetail(){
@@ -684,8 +827,9 @@ function renderDetail(){
 
   el.innerHTML=
     '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px"><div style="flex:1 1 260px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:40px">'+wI(day.wcode)+'</span><div><h3 style="font-family:var(--sf);font-size:22px;font-weight:700">'+day.disp+'</h3><div style="font-size:12.5px;color:var(--txmu)">'+(WMO[day.wcode]||"")+(day.trend!=="steady"?' · <span style="color:'+(day.trend==="improving"?"#4a7c59":"#c45a3c")+'">'+(day.trend==="improving"?"↗ Improving":"↘ Worsening")+'</span>':'')+'</div></div></div>'+scbHTML(day.hike,true)+'</div><div style="flex:1 1 220px;display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;font-size:13px">'+stats.map(function(s){return'<div><div style="color:var(--txmu);font-size:10px;text-transform:uppercase;letter-spacing:.6px">'+s[0]+'</div><div style="color:var(--tx);font-weight:500;margin-top:1px">'+s[1]+'</div></div>';}).join("")+'</div></div>'+
-    winH+
+    winH+renderElevBar(day)+
     '<div class="icd"><h4>Trail Conditions Assessment</h4>'+posH+issH+'<div class="divr">'+tipH+'</div></div>'+
+    renderGearChecklist(day)+
     '<div class="icd"><h4 style="margin-bottom:'+(cached?'12':'10')+'px">🤖 AI Trail Advisor</h4>'+aiH+'</div>'+
     '<div class="hw"><h4>Hourly Breakdown</h4><div class="hs"><div class="htbl"><div class="hh"><span>Time</span><span></span><span>Temp</span><span>Precip</span><span>Wind</span><span>UV</span><span>Humid</span></div><div class="hbd">'+hrows+'</div></div></div></div>';
 }
