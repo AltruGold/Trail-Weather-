@@ -648,11 +648,15 @@ function renderTripPlan(){
     followUps.forEach(function(m){
       if(m.role==="user"){
         // Strip the instruction suffix we append
-        var cleanMsg=m.content.replace(/\n\nIMPORTANT: You MUST respond[\s\S]*/,"");
+        var ci=m.content.indexOf("\n\nIMPORTANT:");
+        var cleanMsg=ci>=0?m.content.substring(0,ci):m.content;
         html+='<div class="chat-msg user">'+esc(cleanMsg)+'</div>';
       }else{
         // Strip tripplan JSON from display
-        var cleanResp=m.content.replace(/<tripplan>[\s\S]*?<\/tripplan>/g,"").trim();
+        var s1=m.content.indexOf("<"+"tripplan>");
+        var s2=m.content.indexOf("</"+"tripplan>");
+        var cleanResp=m.content;
+        if(s1>=0&&s2>=0)cleanResp=(m.content.substring(0,s1)+m.content.substring(s2+12)).trim();
         if(cleanResp)html+='<div class="chat-msg ai">'+formatAI(cleanResp)+'</div>';
         else html+='<div class="chat-msg ai"><p style="color:var(--ac)">✓ Plan updated above.</p></div>';
       }
@@ -675,23 +679,25 @@ function handleTripChat(){
   container.scrollTop=container.scrollHeight;
   sendTripChat(msg).then(function(text){
     // Check if response contains a new trip plan
-    var tm=text.match(/<tripplan>([\s\S]*?)<\/tripplan>/);
-    if(tm){
+    var s1=text.indexOf("<"+"tripplan>");
+    var s2=text.indexOf("</"+"tripplan>");
+    if(s1>=0&&s2>=0){
       try{
-        var newDays=JSON.parse(tm[1].trim());
-        var overview=text.replace(/<tripplan>[\s\S]*?<\/tripplan>/,"").trim();
+        var jsonStr=text.substring(s1+10,s2).trim();
+        var newDays=JSON.parse(jsonStr);
+        var overview=(text.substring(0,s1)+text.substring(s2+12)).trim();
         tripPlan={overview:overview||tripPlan.overview,days:newDays};
-        // Re-render the entire trip planner section with updated plan
         renderTripPlanner();
         return;
       }catch(e){
-        // JSON parse failed, show cleaned text
+        // JSON parse failed
       }
     }
     // Fallback: strip any tripplan tags and show remaining text
-    var clean=text.replace(/<tripplan>[\s\S]*?<\/tripplan>/g,"").trim();
+    var clean=text;
+    if(s1>=0&&s2>=0)clean=(text.substring(0,s1)+text.substring(s2+12)).trim();
     var ldg=document.getElementById("tripchatloading");
-    if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+(clean?formatAI(clean):'<p>Received a response but couldn\'t parse the updated plan. Try rephrasing your request.</p>')+'</div>';
+    if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+(clean?formatAI(clean):'<p>Could not parse the updated plan. Try rephrasing.</p>')+'</div>';
     input=document.getElementById("tripchatinput");btn=document.getElementById("tripchatsend");
     if(input){input.disabled=false;}if(btn){btn.disabled=false;btn.textContent="Send";}
     if(input)input.focus();
