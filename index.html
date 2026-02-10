@@ -136,9 +136,9 @@ a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
 .hw{background:var(--card);border:1px solid var(--bd);border-radius:11px;overflow:hidden;margin-bottom:14px}
 .hw h4{font-family:var(--sf);font-size:16px;font-weight:700;padding:12px 14px 8px}
 .hs{overflow-x:auto}.htbl{min-width:540px}
-.hh{display:grid;grid-template-columns:56px 30px 62px 70px 66px 56px 52px;gap:5px;padding:3px 10px 6px;font-size:9.5px;color:var(--txmu);text-transform:uppercase;letter-spacing:.6px;font-weight:600;border-bottom:1.5px solid var(--bd)}
+.hh{display:grid;grid-template-columns:56px 30px 62px 82px 66px 52px 52px;gap:5px;padding:3px 10px 6px;font-size:9.5px;color:var(--txmu);text-transform:uppercase;letter-spacing:.6px;font-weight:600;border-bottom:1.5px solid var(--bd)}
 .hbd{max-height:400px;overflow-y:auto}
-.hrow{display:grid;grid-template-columns:56px 30px 62px 70px 66px 56px 52px;gap:5px;align-items:center;padding:6px 10px;font-size:12px;border-bottom:1px solid var(--bdl)}
+.hrow{display:grid;grid-template-columns:56px 30px 62px 82px 66px 52px 52px;gap:5px;align-items:center;padding:6px 10px;font-size:12px;border-bottom:1px solid var(--bdl)}
 .hrow.ni{background:rgba(244,240,232,.5)}.hrow .ht2{font-weight:600}
 
 .pttl{font-size:12px;color:var(--txmu);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px}
@@ -535,7 +535,8 @@ function renderWx(){
   document.getElementById("drow").innerHTML=wxDays.map(function(day,i){
     var dt=new Date(day.date+"T12:00:00");var dn=dt.toLocaleDateString("en-US",{weekday:"short"});var md=dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});
     var tH="";if(day.trend==="improving")tH='<div class="tr" style="color:#4a7c59">↗ Improving</div>';else if(day.trend==="worsening")tH='<div class="tr" style="color:#c45a3c">↘ Worsening</div>';
-    return'<div class="dc'+(i===selIdx?" sel":"")+'" onclick="pickDay('+i+')" id="dc'+i+'">'+(i===bestI?'<div class="bb">Best Day</div>':'')+'<div class="dn">'+dn+'</div><div class="dd">'+md+'</div><div class="wi">'+wI(day.wcode)+'</div><div class="tm">'+Math.round(day.tmax)+'° / '+Math.round(day.tmin)+'°</div><div style="margin-top:5px">'+scbHTML(day.hike,false)+'</div>'+tH+(day.pprob>20?'<div class="pp">💧 '+day.pprob+'%</div>':'')+'</div>';
+    var ppH="";if(day.pprob>20){ppH='<div class="pp">💧 '+day.pprob+'%'+(day.psum>=0.1?' · '+day.psum+'"':'')+'</div>';}
+    return'<div class="dc'+(i===selIdx?" sel":"")+'" onclick="pickDay('+i+')" id="dc'+i+'">'+(i===bestI?'<div class="bb">Best Day</div>':'')+'<div class="dn">'+dn+'</div><div class="dd">'+md+'</div><div class="wi">'+wI(day.wcode)+'</div><div class="tm">'+Math.round(day.tmax)+'° / '+Math.round(day.tmin)+'°</div><div style="margin-top:5px">'+scbHTML(day.hike,false)+'</div>'+tH+ppH+'</div>';
   }).join("");
   document.getElementById("wxc").style.display="block";
   document.getElementById("empty").style.display="none";
@@ -803,7 +804,8 @@ function shareTripPlan(){
 // ═══════════════════════════════════════
 function renderDetail(){
   var day=wxDays[selIdx],tips=getTips(day),el=document.getElementById("ddet");
-  var stats=[["High / Low",Math.round(day.tmax)+"° / "+Math.round(day.tmin)+"°F"],["Feels Like",Math.round(day.atmax)+"°F"],["Precipitation",day.pprob+"% · "+day.psum+'"'],["Wind",Math.round(day.wmax)+" mph, gusts "+Math.round(day.gmax)],["UV Index",(day.uvmax||0).toFixed(1)],["Sun",day.sr+" – "+day.ss]];
+  var precipStat=day.pprob+"% chance";if(day.psum>0)precipStat+=" · "+day.psum+'" expected';
+  var stats=[["High / Low",Math.round(day.tmax)+"° / "+Math.round(day.tmin)+"°F"],["Feels Like",Math.round(day.atmax)+"°F"],["Precipitation",precipStat],["Wind",Math.round(day.wmax)+" mph, gusts "+Math.round(day.gmax)],["UV Index",(day.uvmax||0).toFixed(1)],["Sun",day.sr+" – "+day.ss]];
   var winH=day.win?'<div class="wbn"><strong>⏰ Best Hiking Window: </strong>'+day.win+'</div>':"";
   var posH=day.hike.positives.length?'<div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:4px">'+day.hike.positives.map(function(p){return'<span class="pt">✓ '+p+'</span>';}).join("")+'</div>':"";
   var issH=day.hike.issues.length?'<div style="margin-bottom:10px">'+day.hike.issues.map(function(s){return'<div class="iss">⚠ '+s+'</div>';}).join("")+'</div>':"";
@@ -822,7 +824,7 @@ function renderDetail(){
 
   var hrows=day.hrs.map(function(hr){
     var t=new Date(hr.time);var h=t.getHours();var lbl=h===0?"12 AM":h<12?h+" AM":h===12?"12 PM":(h-12)+" PM";var ni=h<6||h>20?" ni":"";
-    return'<div class="hrow'+ni+'"><span class="ht2">'+lbl+'</span><span style="font-size:14px">'+wI(hr.wc)+'</span><span>'+Math.round(hr.t)+'°F</span><span style="color:'+(hr.pp>40?"var(--dng)":"var(--txmu)")+'">💧 '+hr.pp+'%</span><span style="color:'+(hr.ws>20?"var(--dng)":"var(--txmu)")+'">💨 '+Math.round(hr.ws)+'</span><span style="color:'+((hr.uv||0)>6?"var(--dng)":"var(--txmu)")+'">'+(hr.uv||0).toFixed(1)+'</span><span style="color:var(--txmu)">'+Math.round(hr.rh)+'%</span></div>';
+    return'<div class="hrow'+ni+'"><span class="ht2">'+lbl+'</span><span style="font-size:14px">'+wI(hr.wc)+'</span><span>'+Math.round(hr.t)+'°F</span><span style="color:'+(hr.pp>40?"var(--dng)":"var(--txmu)")+'">'+hr.pp+'%'+(hr.pr>0?' · '+hr.pr.toFixed(2)+'"':'')+'</span><span style="color:'+(hr.ws>20?"var(--dng)":"var(--txmu)")+'">💨 '+Math.round(hr.ws)+'</span><span style="color:'+((hr.uv||0)>6?"var(--dng)":"var(--txmu)")+'">'+(hr.uv||0).toFixed(1)+'</span><span style="color:var(--txmu)">'+Math.round(hr.rh)+'%</span></div>';
   }).join("");
 
   el.innerHTML=
@@ -831,7 +833,7 @@ function renderDetail(){
     '<div class="icd"><h4>Trail Conditions Assessment</h4>'+posH+issH+'<div class="divr">'+tipH+'</div></div>'+
     renderGearChecklist(day)+
     '<div class="icd"><h4 style="margin-bottom:'+(cached?'12':'10')+'px">🤖 AI Trail Advisor</h4>'+aiH+'</div>'+
-    '<div class="hw"><h4>Hourly Breakdown</h4><div class="hs"><div class="htbl"><div class="hh"><span>Time</span><span></span><span>Temp</span><span>Precip</span><span>Wind</span><span>UV</span><span>Humid</span></div><div class="hbd">'+hrows+'</div></div></div></div>';
+    '<div class="hw"><h4>Hourly Breakdown</h4><div class="hs"><div class="htbl"><div class="hh"><span>Time</span><span></span><span>Temp</span><span>Rain</span><span>Wind</span><span>UV</span><span>Humid</span></div><div class="hbd">'+hrows+'</div></div></div></div>';
 }
 
 function formatAI(text){return text.split("\n\n").map(function(p){p=p.trim();if(!p)return"";return"<p>"+esc(p).replace(/\n/g,"<br>")+"</p>";}).join("");}
