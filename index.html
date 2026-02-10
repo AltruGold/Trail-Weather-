@@ -415,7 +415,7 @@ function callTripAI(selectedDays,energyMap,lodging,notes){
     var d=wxDays[i];var dt=new Date(d.date+"T12:00:00");
     return dt.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})+" (score "+d.hike.score+"/100, "+d.hike.label+") — Energy: "+energyMap[i];
   }).join("\n");
-  var userMsg='Plan my '+selectedDays.length+'-day hiking trip near '+curLoc.name+'.\n\nDAYS I\'M HIKING:\n'+dayDescs+'\n'+(lodging?'LODGING: I\'m staying near '+lodging+'. Factor in drive time to trailheads.\n':'')+(notes?'ADDITIONAL NOTES: '+notes+'\n':'')+'\nFor EACH day, provide:\n1. A paragraph of tactical advice specific to that day\'s weather and energy level\n2. 1-2 trail recommendations matched to that day\'s conditions and energy budget\n\nOutput the full plan as JSON wrapped in <tripplan> tags:\n\n<tripplan>\n[{"dayIndex":0,"dayLabel":"Monday, Feb 9","advice":"Tactical advice paragraph...","trails":[{"name":"Trail Name","distance":"5 miles","elevation":"1800 ft gain","difficulty":"Strenuous","why":"Why this trail on this day","alltrails":"Trail Name '+curLoc.name+'","webUrl":"","crowdLevel":"Low","driveTime":"20 min from Uptown Sedona"}]}]\n</tripplan>\n\nRules:\n- dayIndex must match the forecast day index (0-6)\n- alltrails field MUST include trail name AND "'+curLoc.name+'"  \n- crowdLevel: "Low", "Moderate", or "High"\n- Include driveTime from lodging if provided\n- Match trail difficulty to each day\'s energy level (Strenuous/Moderate/Easy)\n- Put the hardest hike on the best weather day\n- Prioritize views and solitude\n- Do NOT skip the <tripplan> section';
+  var userMsg='Plan my '+selectedDays.length+'-day hiking trip near '+curLoc.name+'.\n\nDAYS I\'M HIKING:\n'+dayDescs+'\n'+(lodging?'LODGING: I\'m staying near '+lodging+'. Factor in drive time to trailheads.\n':'')+(notes?'ADDITIONAL NOTES: '+notes+'\n':'')+'\nFor EACH day, provide:\n1. A paragraph of tactical advice — focus on strategy, timing, gear, and trail selection rationale. Do NOT restate temperatures or weather stats (they are already displayed to the user). Instead focus on what the weather MEANS for hiking.\n2. 1-2 trail recommendations matched to that day\'s conditions and energy budget\n\nOutput the full plan as JSON wrapped in <tripplan> tags:\n\n<tripplan>\n[{"dayIndex":0,"dayLabel":"Monday, Feb 9","advice":"Tactical advice paragraph — no weather numbers, focus on strategy...","trails":[{"name":"Trail Name","distance":"5 miles","elevation":"1800 ft gain","difficulty":"Strenuous","why":"Why this trail on this day","alltrails":"Trail Name '+curLoc.name+'","webUrl":"","crowdLevel":"Low","driveTime":"20 min from Uptown Sedona"}]}]\n</tripplan>\n\nRules:\n- dayIndex must match the forecast day index (0-6)\n- alltrails field MUST include trail name AND "'+curLoc.name+'"  \n- crowdLevel: "Low", "Moderate", or "High"\n- Include driveTime from lodging if provided\n- Match trail difficulty to each day\'s energy level (Strenuous/Moderate/Easy)\n- Put the hardest hike on the best weather day\n- Prioritize views and solitude\n- Do NOT restate temperature, wind, or precip numbers in the advice — the user already sees these\n- Do NOT skip the <tripplan> section';
   tripChat=[{role:"user",content:userMsg}];
   return claudeAPI(sys,[{role:"user",content:userMsg}],2500).then(function(text){
     tripChat.push({role:"assistant",content:text});
@@ -633,20 +633,29 @@ function renderTripPlan(){
   if(tripPlan.days&&tripPlan.days.length){
     tripPlan.days.forEach(function(day){
       var wxDay=wxDays[day.dayIndex];
-      html+='<div class="tp-day-card"><h5><span>'+wI(wxDay?wxDay.wcode:null)+'</span> '+esc(day.dayLabel)+'</h5>';
-      if(wxDay)html+='<div class="tp-wx">'+Math.round(wxDay.tmax)+'°/'+Math.round(wxDay.tmin)+'°F · '+(WMO[wxDay.wcode]||"")+" · Score: "+wxDay.hike.score+'/100 · '+wxDay.win+'</div>';
+      var dayDate=wxDay?new Date(wxDay.date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"}):day.dayLabel;
+      html+='<div class="tp-day-card"><h5><span>'+wI(wxDay?wxDay.wcode:null)+'</span> '+esc(dayDate)+'</h5>';
+      if(wxDay)html+='<div class="tp-wx">'+Math.round(wxDay.tmax)+'°/'+Math.round(wxDay.tmin)+'°F · '+(WMO[wxDay.wcode]||"")+(wxDay.pprob>20?" · 💧 "+wxDay.pprob+"%"+(wxDay.psum>=0.1?" · "+wxDay.psum+'"':""):"")+" · Wind "+Math.round(wxDay.wmax)+" mph · "+scbHTML(wxDay.hike,false)+' · '+wxDay.win+'</div>';
       if(day.advice)html+='<div class="tp-advice">'+formatAI(day.advice)+'</div>';
       if(day.trails&&day.trails.length)html+=renderTrailsInline(day.trails);
       html+='</div>';
     });
   }
-  // Trip chat
+  // Trip chat - show follow-up messages but strip tripplan JSON
   var followUps=tripChat.slice(2);
   if(followUps.length){
     html+='<div class="chat-msgs" id="tripchatmsgs">';
     followUps.forEach(function(m){
-      if(m.role==="user")html+='<div class="chat-msg user">'+esc(m.content)+'</div>';
-      else html+='<div class="chat-msg ai">'+formatAI(m.content)+'</div>';
+      if(m.role==="user"){
+        // Strip the instruction suffix we append
+        var cleanMsg=m.content.replace(/\n\nIMPORTANT: You MUST respond[\s\S]*/,"");
+        html+='<div class="chat-msg user">'+esc(cleanMsg)+'</div>';
+      }else{
+        // Strip tripplan JSON from display
+        var cleanResp=m.content.replace(/<tripplan>[\s\S]*?<\/tripplan>/g,"").trim();
+        if(cleanResp)html+='<div class="chat-msg ai">'+formatAI(cleanResp)+'</div>';
+        else html+='<div class="chat-msg ai"><p style="color:var(--ac)">✓ Plan updated above.</p></div>';
+      }
     });
     html+='</div>';
   }
@@ -674,16 +683,15 @@ function handleTripChat(){
         tripPlan={overview:overview||tripPlan.overview,days:newDays};
         // Re-render the entire trip planner section with updated plan
         renderTripPlanner();
+        return;
       }catch(e){
-        // JSON parse failed, fall back to showing raw text
-        var ldg=document.getElementById("tripchatloading");
-        if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+formatAI(text)+'</div>';
+        // JSON parse failed, show cleaned text
       }
-    }else{
-      // No tripplan tags, just show the text response
-      var ldg=document.getElementById("tripchatloading");
-      if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+formatAI(text)+'</div>';
     }
+    // Fallback: strip any tripplan tags and show remaining text
+    var clean=text.replace(/<tripplan>[\s\S]*?<\/tripplan>/g,"").trim();
+    var ldg=document.getElementById("tripchatloading");
+    if(ldg)ldg.outerHTML='<div class="chat-msg ai">'+(clean?formatAI(clean):'<p>Received a response but couldn\'t parse the updated plan. Try rephrasing your request.</p>')+'</div>';
     input=document.getElementById("tripchatinput");btn=document.getElementById("tripchatsend");
     if(input){input.disabled=false;}if(btn){btn.disabled=false;btn.textContent="Send";}
     if(input)input.focus();
