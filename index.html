@@ -191,8 +191,8 @@ a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
 .elev-toggle.on::after{transform:translateX(18px)}
 
 /* Share Button */
-.share-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ac);border:1px solid rgba(92,122,90,.3);border-radius:7px;padding:6px 14px;cursor:pointer;transition:all .2s;background:transparent}
-.share-btn:hover{background:rgba(92,122,90,.06)}
+.share-btn{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#fff;background:var(--ac);border:none;border-radius:8px;padding:8px 16px;cursor:pointer;transition:all .2s;-webkit-appearance:none}
+.share-btn:hover{background:var(--ach)}
 
 @media(max-width:600px){.hdr h1{font-size:19px}.dc{width:102px}}
 </style>
@@ -628,7 +628,7 @@ function runTripAI(){
 
 function renderTripPlan(){
   if(!tripPlan)return"";
-  var html='<div class="tp-out"><div style="font-weight:700;font-size:14px;margin-bottom:8px">Your Trip Plan</div><div style="margin-bottom:12px"><button class="share-btn" id="sharebtn" onclick="shareTripPlan()">📤 Share Plan</button></div>';
+  var html='<div class="tp-out"><div style="font-weight:700;font-size:14px;margin-bottom:8px">Your Trip Plan</div><div style="margin-bottom:12px"><div class="share-btn" id="sharebtn" onclick="shareTripPlan()" role="button">📤 Share Plan</div></div>';
   if(tripPlan.overview)html+='<div style="font-size:13px;line-height:1.6;margin-bottom:14px">'+formatAI(tripPlan.overview)+'</div>';
   if(tripPlan.days&&tripPlan.days.length){
     tripPlan.days.forEach(function(day){
